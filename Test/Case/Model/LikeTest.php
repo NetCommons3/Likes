@@ -31,16 +31,6 @@ class LikeTest extends YACakeTestCase {
  */
 	public $fixtures = array(
 		'plugin.likes.like',
-		//'plugin.announcements.plugin',
-		//'plugin.plugins.plugin',
-		//'plugin.blocks.block',
-		//'plugin.boxes.box',
-		//'plugin.comments.comment',
-		//'plugin.frames.frame',
-		//'plugin.m17n.language',
-		//'plugin.rooms.room',
-		//'plugin.users.user',
-		//'plugin.users.user_attributes_user',
 	);
 
 /**
