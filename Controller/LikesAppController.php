@@ -24,8 +24,8 @@ class LikesAppController extends AppController {
  *
  * @var array
  */
-	public $components = array(
-		'Security'
-	);
+	//public $components = array(
+	//	'Security'
+	//);
 
 }
