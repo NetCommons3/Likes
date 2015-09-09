@@ -119,3 +119,42 @@ NetCommonsApp.controller('Likes', function($scope, LikesSave) {
         });
   };
 });
+
+
+/**
+ * LikeSettings Controller Javascript
+ *
+ * @param {string} Controller name
+ * @param {function($scope)} Controller
+ */
+NetCommonsApp.controller('LikeSettings', function($scope) {
+
+  /**
+   * initialize
+   *   - useLikeDomId
+   *   - useUnlikeDomId
+   *
+   * @return {void}
+   */
+  $scope.initialize = function(useLikeDomId, useUnlikeDomId) {
+    $scope.useLikeDomId = useLikeDomId;
+    $scope.useUnlikeDomId = useUnlikeDomId;
+  };
+
+  /**
+   * Use like button
+   *
+   * @return {void}
+   */
+  $scope.useLike = function() {
+    var likeElement = $('#' + $scope.useLikeDomId);
+    var unlikeElement = $('#' + $scope.useUnlikeDomId);
+
+    if (likeElement[0].checked) {
+      unlikeElement[0].disabled = false;
+    } else {
+      unlikeElement[0].disabled = true;
+      unlikeElement[0].checked = false;
+    }
+  };
+});
