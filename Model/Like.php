@@ -51,22 +51,22 @@ class Like extends LikesAppModel {
 	public function beforeValidate($options = array()) {
 		$this->validate = Hash::merge($this->validate, array(
 			'plugin_key' => array(
-				'notEmpty' => array(
-					'rule' => array('notEmpty'),
+				'notBlank' => array(
+					'rule' => array('notBlank'),
 					'message' => __d('net_commons', 'Invalid request.'),
 					'required' => true,
 				)
 			),
 			'block_key' => array(
-				'notEmpty' => array(
-					'rule' => array('notEmpty'),
+				'notBlank' => array(
+					'rule' => array('notBlank'),
 					'message' => __d('net_commons', 'Invalid request.'),
 					'required' => true,
 				)
 			),
 			'content_key' => array(
-				'notEmpty' => array(
-					'rule' => array('notEmpty'),
+				'notBlank' => array(
+					'rule' => array('notBlank'),
 					'message' => __d('net_commons', 'Invalid request.'),
 					'required' => true,
 				)
