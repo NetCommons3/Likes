@@ -39,6 +39,8 @@ class Like extends LikesAppModel {
  */
 	public $validate = array();
 
+	//The Associations below have been created with all possible keys, those that are not needed can be removed
+
 /**
  * Called during validation operations, before validation. Please note that custom
  * validation rules can be defined in $validate.
@@ -71,118 +73,41 @@ class Like extends LikesAppModel {
 					'required' => true,
 				)
 			),
-			'is_liked' => array(
-				'boolean' => array(
-					'rule' => array('boolean'),
+			'like_count' => array(
+				'numeric' => array(
+					'rule' => array('numeric'),
 					'message' => __d('net_commons', 'Invalid request.'),
-				)
+				),
+			),
+			'unlike_count' => array(
+				'numeric' => array(
+					'rule' => array('numeric'),
+					'message' => __d('net_commons', 'Invalid request.'),
+				),
 			),
 		));
 		return parent::beforeValidate($options);
 	}
 
 /**
- * Get count of is_liked
+ * hasAndBelongsToMany associations
  *
- * @param string $contentKey Content key of each plugin.
- * @param bool $isLiked Is liked value
- * @return int number
+ * @var array
  */
-	public function getCountLike($contentKey, $isLiked) {
-		return $this->find('count', array(
-			'recursive' => -1,
-			'conditions' => array(
-				'content_key' => $contentKey,
-				'is_liked' => $isLiked
-			),
-		));
-	}
-
-/**
- * Exists like data
- *
- * @param string $contentKey Content key of each plugin.
- * @param int $userId Users.id
- * @return bool
- */
-	public function existsLike($contentKey, $userId) {
-		$count = $this->find('count', array(
-			'recursive' => -1,
-			'conditions' => array(
-				'content_key' => $contentKey,
-				'user_id' => $userId
-			),
-		));
-
-		return ($count > 0 ? true : false);
-	}
-
-/**
- * Get data of like
- *
- * @param string $contentKey Content key of each plugin.
- * @param int $userId Users.id
- * @return array Like data
- */
-	public function getLike($contentKey, $userId) {
-		return $this->find('first', array(
-			'recursive' => -1,
-			'conditions' => array(
-				'content_key' => $contentKey,
-				'user_id' => $userId
-			),
-		));
-	}
-
-/**
- * Save is_liked
- *
- * @param array $data received post data
- * @return mixed On success Model::$data if its not empty or true, false on failure
- * @throws InternalErrorException
- */
-	public function saveLike($data) {
-		//トランザクションBegin
-		$dataSource = $this->getDataSource();
-		$dataSource->begin();
-
-		try {
-			//バリデーション
-			if (!$this->validateLike($data)) {
-				return false;
-			}
-
-			//登録処理
-			if (! $this->save(null, false)) {
-				throw new InternalErrorException(__d('net_commons', 'Internal Server Error'));
-			}
-
-			//トランザクションCommit
-			$dataSource->commit();
-
-		} catch (Exception $ex) {
-			//トランザクションRollback
-			$dataSource->rollback();
-			CakeLog::error($ex);
-			throw $ex;
-		}
-
-		return true;
-	}
-
-/**
- * validate bbs_frame_setting
- *
- * @param array $data received post data
- * @return bool True on success, false on error
- */
-	public function validateLike($data) {
-		$this->set($data);
-		$this->validates();
-		if ($this->validationErrors) {
-			return false;
-		}
-		return true;
-	}
+	public $hasAndBelongsToMany = array(
+		'User' => array(
+			'className' => 'User',
+			'joinTable' => 'likes_users',
+			'foreignKey' => 'like_id',
+			'associationForeignKey' => 'user_id',
+			'unique' => 'keepExisting',
+			'conditions' => '',
+			'fields' => '',
+			'order' => '',
+			'limit' => '',
+			'offset' => '',
+			'finderQuery' => '',
+		)
+	);
 
 }
