@@ -78,7 +78,7 @@ class LikesController extends LikesAppController {
 
 		$this->Like->setDataSource('master');
 		$this->Like->saveLike($data);
-		if ($this->handleValidationError($this->Like->validationErrors)) {
+		if ($this->NetCommons->handleValidationError($this->Like->validationErrors)) {
 			if (! $this->request->is('ajax')) {
 				$this->redirect($this->request->referer());
 			}
