@@ -33,17 +33,17 @@ class LikesController extends LikesAppController {
  *
  * @var array
  */
-	public $components = array(
-		'NetCommons.NetCommonsFrame',
-		'NetCommons.NetCommonsWorkflow',
-		'NetCommons.NetCommonsRoomRole' => array(
-			//コンテンツの権限設定
-			//'allowedActions' => array(
-			//	'contentCreatable' => array('add', 'reply', 'edit', 'delete'),
-			//	'bbsPostCreatable' => array('add', 'reply', 'edit', 'delete')
-			//),
-		),
-	);
+//	public $components = array(
+//		'NetCommons.NetCommonsFrame',
+//		'NetCommons.NetCommonsWorkflow',
+//		'NetCommons.NetCommonsRoomRole' => array(
+//			//コンテンツの権限設定
+//			//'allowedActions' => array(
+//			//	'contentCreatable' => array('add', 'reply', 'edit', 'delete'),
+//			//	'bbsPostCreatable' => array('add', 'reply', 'edit', 'delete')
+//			//),
+//		),
+//	);
 
 /**
  * beforeFilter
@@ -66,25 +66,14 @@ class LikesController extends LikesAppController {
 			return;
 		}
 
-		if ($this->Like->existsLike($this->data['Like']['content_key'], (int)$this->Auth->user('id'))) {
-			if (! $this->request->is('ajax')) {
-				$this->redirect($this->request->referer());
-			}
+		if ($this->Like->existsLike($this->data['Like']['content_key'])) {
 			return;
 		}
 
 		$data = $this->data;
-		$data['Like']['user_id'] = (int)$this->Auth->user('id');
-
-		$this->Like->setDataSource('master');
-		$this->Like->saveLike($data);
-		if ($this->NetCommons->handleValidationError($this->Like->validationErrors)) {
-			if (! $this->request->is('ajax')) {
-				$this->redirect($this->request->referer());
-			}
+		if ($this->Like->saveLike($data)) {
 			return;
 		}
-
-		$this->_throwBadRequest();
+		$this->NetCommons->handleValidationError($this->Like->validationErrors);
 	}
 }

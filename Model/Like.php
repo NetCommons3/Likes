@@ -42,6 +42,27 @@ class Like extends LikesAppModel {
 	//The Associations below have been created with all possible keys, those that are not needed can be removed
 
 /**
+ * hasAndBelongsToMany associations
+ *
+ * @var array
+ */
+	public $hasAndBelongsToMany = array(
+		'User' => array(
+			'className' => 'User',
+			'joinTable' => 'likes_users',
+			'foreignKey' => 'like_id',
+			'associationForeignKey' => 'user_id',
+			'unique' => 'keepExisting',
+			'conditions' => '',
+			'fields' => '',
+			'order' => '',
+			'limit' => '',
+			'offset' => '',
+			'finderQuery' => '',
+		)
+	);
+
+/**
  * Called during validation operations, before validation. Please note that custom
  * validation rules can be defined in $validate.
  *
@@ -86,28 +107,144 @@ class Like extends LikesAppModel {
 				),
 			),
 		));
-		return parent::beforeValidate($options);
+		if (! parent::beforeValidate($options)) {
+			return false;
+		}
+
+		if (isset($this->data['LikesUser'])) {
+			$this->LikesUser->set($this->data['LikesUser']);
+			if (! $this->LikesUser->validates()) {
+				$this->validationErrors = Hash::merge($this->validationErrors, $this->LikesUser->validationErrors);
+				return false;
+			}
+		}
+	}
+
+
+/**
+ * Called after each successful save operation.
+ *
+ * @param bool $created True if this save created a new record
+ * @param array $options Options passed from Model::save().
+ * @return void
+ * @link http://book.cakephp.org/2.0/en/models/callback-methods.html#aftersave
+ * @see Model::save()
+ */
+	public function afterSave($created, $options = array()) {
+		//LikesUser登録
+		if (isset($this->LikesUser->data['LikesUser'])) {
+			if (! $this->LikesUser->data['LikesUser']['like_id']) {
+				$this->LikesUser->data['LikesUser']['like_id'] = $this->data[$this->alias]['id'];
+			}
+			if (! $this->LikesUser->save(null, false)) {
+				throw new InternalErrorException(__d('net_commons', 'Internal Server Error'));
+			}
+
+			$likeCount = $this->LikesUser->find('count', array(
+				'recursive' => -1,
+				'conditions' => array(
+					'like_id' => $this->data[$this->alias]['id'],
+					'is_liked' => true
+				)
+			));
+
+			$unlikeCount = $this->LikesUser->find('count', array(
+				'recursive' => -1,
+				'conditions' => array(
+					'like_id' => $this->data[$this->alias]['id'],
+					'is_liked' => false
+				)
+			));
+
+			$update = array(
+				$this->alias . '.like_count' => $likeCount,
+				$this->alias . '.unlike_count' => $unlikeCount,
+			);
+			$conditions = array(
+				$this->alias . '.id' => $this->data[$this->alias]['id']
+			);
+			if (! $this->updateAll($update, $conditions)) {
+				throw new InternalErrorException(__d('net_commons', 'Internal Server Error'));
+			}
+		}
+
+		parent::afterSave($created, $options);
 	}
 
 /**
- * hasAndBelongsToMany associations
+ * Exists like data
  *
- * @var array
+ * @param string $contentKey Content key of each plugin.
+ * @param int $userId Users.id
+ * @return bool
  */
-	public $hasAndBelongsToMany = array(
-		'User' => array(
-			'className' => 'User',
-			'joinTable' => 'likes_users',
-			'foreignKey' => 'like_id',
-			'associationForeignKey' => 'user_id',
-			'unique' => 'keepExisting',
-			'conditions' => '',
-			'fields' => '',
-			'order' => '',
-			'limit' => '',
-			'offset' => '',
-			'finderQuery' => '',
-		)
-	);
+	public function existsLike($contentKey) {
+		$this->LikesUser = ClassRegistry::init('Likes.LikesUser');
+
+		$joinConditions = array(
+			$this->alias . '.id' . ' = ' . $this->LikesUser->alias . ' .like_id',
+		);
+		if (Current::read('User.id')) {
+			$joinConditions[$this->LikesUser->alias . '.user_id'] = Current::read('User.id');
+		} else {
+			$joinConditions[$this->LikesUser->alias . '.session_key'] = CakeSession::id();
+		}
+
+		$count = $this->find('count', array(
+			'recursive' => -1,
+			'conditions' => array(
+				$this->alias . '.content_key' => $contentKey,
+			),
+			'joins' => array(
+				array(
+					'table' => $this->LikesUser->table,
+					'alias' => $this->LikesUser->alias,
+					'type' => 'INNER',
+					'conditions' => $joinConditions,
+				),
+			)
+		));
+		return (bool)$count;
+	}
+
+/**
+ * Save is_liked
+ *
+ * @param array $data received post data
+ * @return mixed On success Model::$data if its not empty or true, false on failure
+ * @throws InternalErrorException
+ */
+	public function saveLike($data) {
+		$this->loadModels([
+			'LikesUser' => 'Likes.LikesUser',
+		]);
+
+		//トランザクションBegin
+		$this->begin();
+
+		//バリデーション
+		$data['LikesUser']['session_key'] = CakeSession::id();
+		$this->set($data);
+		if (! $this->validates()) {
+			$this->rollback();
+			return false;
+		}
+
+		try {
+			//登録処理
+			if (! $this->save(null, false)) {
+				throw new InternalErrorException(__d('net_commons', 'Internal Server Error'));
+			}
+
+			//トランザクションCommit
+			$this->commit();
+
+		} catch (Exception $ex) {
+			//トランザクションRollback
+			$this->rollback($ex);
+		}
+
+		return true;
+	}
 
 }

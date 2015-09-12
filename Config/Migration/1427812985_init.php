@@ -1,6 +1,6 @@
 <?php
 /**
- * Likes Migration
+ * Init Migration
  *
  * @author Noriko Arai <arai@nii.ac.jp>
  * @author Shohei Nakajima <nakajimashouhei@gmail.com>
@@ -9,20 +9,20 @@
  */
 
 /**
- * Likes Migration
+ * Init Migration
  *
  * @author Noriko Arai <arai@nii.ac.jp>
  * @author Shohei Nakajima <nakajimashouhei@gmail.com>
  * @package NetCommons\Likes\Config\Migration
  */
-class Initialize extends CakeMigration {
+class Init extends CakeMigration {
 
 /**
  * Migration description
  *
  * @var string
  */
-	public $description = 'initialize';
+	public $description = 'init';
 
 /**
  * Actions to be performed
@@ -52,6 +52,7 @@ class Initialize extends CakeMigration {
 					'id' => array('type' => 'integer', 'null' => false, 'default' => null, 'key' => 'primary', 'comment' => 'ID |  |  | '),
 					'like_id' => array('type' => 'integer', 'null' => true, 'default' => null, 'comment' => 'User ID | いいねID | likes.id | '),
 					'user_id' => array('type' => 'integer', 'null' => true, 'default' => null, 'comment' => 'User ID | ユーザID | users.id | '),
+					'session_key' => array('type' => 'string', 'null' => true, 'default' => null, 'collate' => 'utf8_general_ci', 'comment' => 'Session key | セッションKey | | ', 'charset' => 'utf8'),
 					'is_liked' => array('type' => 'boolean', 'null' => true, 'default' => null, 'comment' => 'Is liked 0:unlike, 1:like | 0:わるいね、1:いいね | | '),
 					'created_user' => array('type' => 'integer', 'null' => true, 'default' => '0', 'comment' => 'created user | 作成者 | users.id | '),
 					'created' => array('type' => 'datetime', 'null' => true, 'default' => null, 'comment' => 'created datetime | 作成日時 |  | '),

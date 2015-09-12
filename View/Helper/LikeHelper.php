@@ -29,6 +29,7 @@ class LikeHelper extends AppHelper {
 		'Form',
 		'NetCommons.NetCommonsForm',
 		'NetCommons.NetCommonsHtml',
+		'NetCommons.Token',
 	);
 
 /**
@@ -102,4 +103,144 @@ class LikeHelper extends AppHelper {
 
 		return $output;
 	}
+
+/**
+ * Output like and unlike display element
+ *
+ * @param array $attributes Array of attributes and HTML arguments.
+ * @return string HTML tags
+ */
+	public function display($setting, $content, $attributes = array()) {
+		$output = '';
+		if (isset($attributes['div'])) {
+			if (! is_array($attributes['div'])) {
+				$attributes['div'] = (array)$attributes['div'];
+			}
+			if (! isset($attributes['div']['class'])) {
+				$attributes['div']['class'] = array('inline-block', 'like-icon', 'text-muted');
+			}
+		}
+
+		//いいね
+		if (isset($setting['use_like']) && $setting['use_like']) {
+			if (isset($attributes['div'])) {
+				$output .= '<div class="' . implode(' ', (array)$attributes['div']['class']) . '">';
+			}
+			$output .= '<span class="glyphicon glyphicon-thumbs-up"></span> ';
+			$output .= (int)Hash::get($content, 'Like.like_count');
+			if (isset($attributes['div'])) {
+				$output .= '</div>';
+			}
+		}
+
+		//わるいね
+		if (isset($setting['use_unlike']) && $setting['use_unlike']) {
+			if (isset($attributes['div'])) {
+				$output .= '<div class="' . implode(' ', (array)$attributes['div']['class']) . '">';
+			}
+			$output .= '<span class="glyphicon glyphicon-thumbs-down"></span> ';
+			$output .= (int)Hash::get($content, 'Like.unlike_count');
+			if (isset($attributes['div'])) {
+				$output .= '</div>';
+			}
+		}
+
+		return $output;
+	}
+
+/**
+ * Output like and unlike buttons element
+ *
+ * @param array $attributes Array of attributes and HTML arguments.
+ * @return string HTML tags
+ */
+	public function buttons($model, $setting, $content, $attributes = array()) {
+		$output = '';
+
+		if (isset($content['LikesUser']['id']) || $content[$model]['status'] !== WorkflowComponent::STATUS_PUBLISHED) {
+			return $this->display($setting, $content, $attributes);
+		}
+
+		if (isset($attributes['div'])) {
+			if (! is_array($attributes['div'])) {
+				$attributes['div'] = (array)$attributes['div'];
+			}
+			if (! isset($attributes['div']['class'])) {
+				$attributes['div']['class'] = array('inline-block', 'like-icon');
+			}
+		}
+
+		if (! isset($content['Like']['id'])) {
+			$content['Like'] = array(
+				'plugin_key' => $this->_View->request->params['plugin'],
+				'block_key' => Current::read('Block.key'),
+				'content_key' => $content[$model]['key'],
+			);
+		}
+		if (! isset($content['LikesUser']['id'])) {
+			$content['LikesUser'] = array(
+				'like_id' => null,
+				'user_id' => Current::read('User.id'),
+				'is_liked' => '0',
+			);
+		}
+
+		$data = array(
+			'Frame' => array('id' => Current::read('Frame.id')),
+			'Like' => array(
+				'plugin_key' => Hash::get($content, 'Like.plugin_key'),
+				'block_key' => Hash::get($content, 'Like.block_key'),
+				'content_key' => Hash::get($content, 'Like.content_key'),
+			),
+			'LikesUser' => array(
+				'like_id' => Hash::get($content, 'LikesUser.like_id'),
+				'user_id' => Hash::get($content, 'LikesUser.user_id'),
+				'is_liked' => Hash::get($content, 'LikesUser.is_liked'),
+			),
+		);
+		$options = array(
+			'likeCount' => (int)Hash::get($content, 'LikesUser.like_count'),
+			'unlikeCount' => (int)Hash::get($content, 'LikesUser.unlike_count'),
+			'disabled' => false
+		);
+
+		$tokenFields = Hash::flatten($data);
+		$hiddenFields = $tokenFields;
+		unset($hiddenFields['LikesUser.is_liked']);
+		$hiddenFields = array_keys($hiddenFields);
+
+		$this->_View->request->data = $data;
+		$tokens = $this->Token->getToken('Like', '/likes/likes/like.json', $tokenFields, $hiddenFields);
+		$data += $tokens;
+
+		$output .= '<div class="form-inline" ng-controller="Likes" ' .
+						'ng-init="initialize(' . h(json_encode($data)) . ', ' . h(json_encode($options)) . ')">';
+
+		//いいね
+		if (isset($setting['use_like']) && $setting['use_like']) {
+			if (isset($attributes['div'])) {
+				$output .= '<div class="' . implode(' ', (array)$attributes['div']['class']) . '">';
+			}
+			$output .= $this->_View->element('Likes.like_button', array('isLiked' => Like::IS_LIKE));
+			if (isset($attributes['div'])) {
+				$output .= '</div>';
+			}
+		}
+
+		//わるいね
+		if (isset($setting['use_unlike']) && $setting['use_unlike']) {
+			if (isset($attributes['div'])) {
+				$output .= '<div class="' . implode(' ', (array)$attributes['div']['class']) . '">';
+			}
+			$output .= $this->_View->element('Likes.like_button', array('isLiked' => Like::IS_UNLIKE));
+			if (isset($attributes['div'])) {
+				$output .= '</div>';
+			}
+		}
+
+		$output .= '</div>';
+
+		return $output;
+	}
+
 }

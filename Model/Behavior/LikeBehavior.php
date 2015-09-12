@@ -21,14 +21,14 @@ class LikeBehavior extends ModelBehavior {
  *
  * @var array
  */
-	public $model;
+	private $__model;
 
 /**
  * Key field name
  *
  * @var array
  */
-	public $field;
+	private $__field;
 
 /**
  * SetUp behavior
@@ -37,45 +37,83 @@ class LikeBehavior extends ModelBehavior {
  * @param array $config array of configuration settings.
  * @return void
  */
-//	public function setup(Model $model, $config = array()) {
-//		if (isset($config['model'])) {
-//			$this->model = $config['model'];
-//		} else {
-//			$this->model = $model->alias;
-//		}
-//		if (isset($config['field'])) {
-//			$this->field = $config['field'];
-//		} else {
-//			$this->field = 'key';
-//		}
-//
-//		parent::setup($model, $config);
-//	}
+	public function setup(Model $model, $config = array()) {
+		if (isset($config['model'])) {
+			$this->__model = $config['model'];
+		} else {
+			$this->__model = $model->name;
+		}
+
+		if (isset($config['field'])) {
+			$this->__field = $config['field'];
+		} else {
+			$this->__field = 'key';
+		}
+
+		parent::setup($model, $config);
+	}
 
 /**
- * After find callback. Can be used to modify any results returned by find.
+ * beforeFind can be used to cancel find operations, or modify the query that will be executed.
+ * By returning null/false you can abort a find. By returning an array you can modify/replace the query
+ * that is going to be run.
  *
  * @param Model $model Model using this behavior
- * @param mixed $results The results of the find operation
- * @param bool $primary Whether this model is being queried directly (vs. being queried as an association)
- * @return mixed An array value will replace the value of $results - any other value will be ignored.
- * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+ * @param array $query Data used to execute this query, i.e. conditions, order, etc.
+ * @return bool|array False or null will abort the operation. You can return an array to replace the
+ *   $query that will be eventually run.
  */
-//	public function afterFind(Model $model, $results, $primary = false) {
-//		$this->Like = ClassRegistry::init('Likes.Like', true);
-//		$user = CakeSession::read('Auth.User');
-//		foreach ($results as $i => $result) {
-//			if (isset($result[$this->model][$this->field])) {
-//				$likeCounts = $this->Like->getCountLike($result[$this->model][$this->field], Like::IS_LIKE);
-//				$unlikeCounts = $this->Like->getCountLike($result[$this->model][$this->field], Like::IS_UNLIKE);
-//			}
-//			if (isset($result[$this->model][$this->field]) && isset($user['id'])) {
-//				$results[$i] = Hash::merge($results[$i], $this->Like->getLike($result[$this->model][$this->field], $user['id']));
-//			}
-//			$results[$i][$this->model]['like_counts'] = isset($likeCounts) ? $likeCounts : 0;
-//			$results[$i][$this->model]['unlike_counts'] = isset($unlikeCounts) ? $unlikeCounts : 0;
-//		}
-//
-//		return $results;
-//	}
+	public function beforeFind(Model $model, $query) {
+		$model->Like = ClassRegistry::init('Likes.Like');
+		$model->LikesUser = ClassRegistry::init('Likes.LikesUser');
+
+		$hasJoinTable = false;
+
+		$conditions = $query['conditions'];
+		if (is_array($query['conditions']) === false) {
+			return $query;
+		}
+
+		$columns = array();
+		if (! isset($query['fields'])) {
+			$columns = 'Like.*';
+		} else {
+			$columns = $query['fields'];
+		}
+
+		$columns = Hash::merge((array)$columns, array_keys($conditions));
+		// Like条件あったらJOIN
+		if (! preg_grep('/^Like\./', $columns) && ! preg_grep('/^LikesUser\./', $columns)) {
+			return $query;
+		}
+
+		if (! isset($query['fields'])) {
+			$query['fields'] = '*';
+		}
+		$query['joins'][] = array(
+			'table' => $model->Like->table,
+			'alias' => $model->Like->alias,
+			'type' => 'LEFT',
+			'conditions' => array(
+				'Like.plugin_key' => Inflector::underscore($model->plugin),
+				$this->__model . '.' . $this->__field . ' = ' . 'Like.content_key',
+			)
+		);
+
+		$likesUserConditions = array(
+			'Like.id = LikesUser.like_id',
+		);
+		if (Current::read('User.id')) {
+			$likesUserConditions['LikesUser.user_id'] = Current::read('User.id');
+		} else {
+			$likesUserConditions['LikesUser.session_key'] = CakeSession::id();
+		}
+		$query['joins'][] = array(
+			'table' => $model->LikesUser->table,
+			'alias' => $model->LikesUser->alias,
+			'type' => 'LEFT',
+			'conditions' => $likesUserConditions
+		);
+		return $query;
+	}
 }

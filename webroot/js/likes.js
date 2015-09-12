@@ -22,7 +22,7 @@ NetCommonsApp.factory('LikesSave', ['$http', '$q', function($http, $q) {
 
           //POSTリクエスト
           $http.post(
-              '/likes/likes/like/' + post['Frame']['id'] + '.json',
+              '/likes/likes/like.json',
               $.param({_method: 'POST', data: post}),
               {cache: false,
                 headers:
@@ -102,16 +102,16 @@ NetCommonsApp.controller('Likes', function($scope, LikesSave) {
    * @return {void}
    */
   $scope.save = function(isLiked) {
-    $scope.data['Like']['is_liked'] = isLiked;
+    $scope.data['LikesUser']['is_liked'] = isLiked;
 
     LikesSave($scope.data)
       .success(function(data) {
           //success condition
           $scope.options.disabled = true;
           if (isLiked) {
-            $scope.options['likeCounts'] = $scope.options['likeCounts'] + 1;
+            $scope.options['likeCount'] = $scope.options['likeCount'] + 1;
           } else {
-            $scope.options['unlikeCounts'] = $scope.options['unlikeCounts'] + 1;
+            $scope.options['unlikeCount'] = $scope.options['unlikeCount'] + 1;
           }
         })
       .error(function(data, status) {

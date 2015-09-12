@@ -9,18 +9,17 @@
  */
 ?>
 
-<button name="save_<?php echo NetCommonsBlockComponent::STATUS_PUBLISHED; ?>"
+<button name="save" class="btn btn-link btn-likes"
 	ng-disabled="(options.disabled || sending)"
-	class="btn btn-link btn-likes"
-	ng-click="save(<?php echo $isLiked; ?>)">
+	ng-click="save(<?php echo $isLiked; ?>)" ng-cloak>
 
 	<span ng-class="{'text-muted':options.disabled}">
 		<?php if ($isLiked === Like::IS_LIKE) : ?>
 			<span class="glyphicon glyphicon-thumbs-up"></span>
-			{{options.likeCounts}}
+			{{options.likeCount}}
 		<?php else : ?>
 			<span class="glyphicon glyphicon-thumbs-down"></span>
-			{{options.unlikeCounts}}
+			{{options.unlikeCount}}
 		<?php endif; ?>
 	</span>
 </button>
