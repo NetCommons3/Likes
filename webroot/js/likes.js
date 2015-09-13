@@ -22,7 +22,7 @@ NetCommonsApp.factory('LikesSave', ['$http', '$q', function($http, $q) {
 
           //POSTリクエスト
           $http.post(
-              '/likes/likes/like/' + post['Frame']['id'] + '.json',
+              '/likes/likes/like.json',
               $.param({_method: 'POST', data: post}),
               {cache: false,
                 headers:
@@ -102,20 +102,59 @@ NetCommonsApp.controller('Likes', function($scope, LikesSave) {
    * @return {void}
    */
   $scope.save = function(isLiked) {
-    $scope.data['Like']['is_liked'] = isLiked;
+    $scope.data['LikesUser']['is_liked'] = isLiked;
 
     LikesSave($scope.data)
       .success(function(data) {
           //success condition
           $scope.options.disabled = true;
           if (isLiked) {
-            $scope.options['likeCounts'] = $scope.options['likeCounts'] + 1;
+            $scope.options['likeCount'] = $scope.options['likeCount'] + 1;
           } else {
-            $scope.options['unlikeCounts'] = $scope.options['unlikeCounts'] + 1;
+            $scope.options['unlikeCount'] = $scope.options['unlikeCount'] + 1;
           }
         })
       .error(function(data, status) {
           //error condition
         });
+  };
+});
+
+
+/**
+ * LikeSettings Controller Javascript
+ *
+ * @param {string} Controller name
+ * @param {function($scope)} Controller
+ */
+NetCommonsApp.controller('LikeSettings', function($scope) {
+
+  /**
+   * initialize
+   *   - useLikeDomId
+   *   - useUnlikeDomId
+   *
+   * @return {void}
+   */
+  $scope.initialize = function(useLikeDomId, useUnlikeDomId) {
+    $scope.useLikeDomId = useLikeDomId;
+    $scope.useUnlikeDomId = useUnlikeDomId;
+  };
+
+  /**
+   * Use like button
+   *
+   * @return {void}
+   */
+  $scope.useLike = function() {
+    var likeElement = $('#' + $scope.useLikeDomId);
+    var unlikeElement = $('#' + $scope.useUnlikeDomId);
+
+    if (likeElement[0].checked) {
+      unlikeElement[0].disabled = false;
+    } else {
+      unlikeElement[0].disabled = true;
+      unlikeElement[0].checked = false;
+    }
   };
 });
