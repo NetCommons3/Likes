@@ -67,8 +67,6 @@ class LikeBehavior extends ModelBehavior {
 		$model->Like = ClassRegistry::init('Likes.Like');
 		$model->LikesUser = ClassRegistry::init('Likes.LikesUser');
 
-		$hasJoinTable = false;
-
 		$conditions = $query['conditions'];
 		if (is_array($query['conditions']) === false) {
 			return $query;

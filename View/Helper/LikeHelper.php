@@ -47,8 +47,10 @@ class LikeHelper extends AppHelper {
 	}
 
 /**
- * Output categories select element
+ * Output use like setting element
  *
+ * @param string $likeFieldName This should be "Modelname.fieldname" for use_like field
+ * @param string $unlikeFieldName This should be "Modelname.fieldname" for use_unlike field
  * @param array $attributes Array of attributes and HTML arguments.
  * @return string HTML tags
  */
@@ -107,42 +109,29 @@ class LikeHelper extends AppHelper {
 /**
  * Output like and unlike display element
  *
+ * @param array $setting Array of use like setting data.
+ * @param array $content Array of content data with like count.
  * @param array $attributes Array of attributes and HTML arguments.
  * @return string HTML tags
  */
 	public function display($setting, $content, $attributes = array()) {
 		$output = '';
-		if (isset($attributes['div'])) {
-			if (! is_array($attributes['div'])) {
-				$attributes['div'] = (array)$attributes['div'];
-			}
-			if (! isset($attributes['div']['class'])) {
-				$attributes['div']['class'] = array('inline-block', 'like-icon', 'text-muted');
-			}
-		}
+		list($outBeginDiv, $outEndDiv) = $this->__displayDiv($attributes, array('inline-block', 'like-icon', 'text-muted'));
 
 		//いいね
 		if (isset($setting['use_like']) && $setting['use_like']) {
-			if (isset($attributes['div'])) {
-				$output .= '<div class="' . implode(' ', (array)$attributes['div']['class']) . '">';
-			}
+			$output .= $outBeginDiv;
 			$output .= '<span class="glyphicon glyphicon-thumbs-up"></span> ';
 			$output .= (int)Hash::get($content, 'Like.like_count');
-			if (isset($attributes['div'])) {
-				$output .= '</div>';
-			}
+			$output .= $outEndDiv;
 		}
 
 		//わるいね
 		if (isset($setting['use_unlike']) && $setting['use_unlike']) {
-			if (isset($attributes['div'])) {
-				$output .= '<div class="' . implode(' ', (array)$attributes['div']['class']) . '">';
-			}
+			$output .= $outBeginDiv;
 			$output .= '<span class="glyphicon glyphicon-thumbs-down"></span> ';
 			$output .= (int)Hash::get($content, 'Like.unlike_count');
-			if (isset($attributes['div'])) {
-				$output .= '</div>';
-			}
+			$output .= $outEndDiv;
 		}
 
 		return $output;
@@ -151,6 +140,9 @@ class LikeHelper extends AppHelper {
 /**
  * Output like and unlike buttons element
  *
+ * @param array $model String of model name
+ * @param array $setting Array of use like setting data.
+ * @param array $content Array of content data with like count.
  * @param array $attributes Array of attributes and HTML arguments.
  * @return string HTML tags
  */
@@ -161,14 +153,7 @@ class LikeHelper extends AppHelper {
 			return $this->display($setting, $content, $attributes);
 		}
 
-		if (isset($attributes['div'])) {
-			if (! is_array($attributes['div'])) {
-				$attributes['div'] = (array)$attributes['div'];
-			}
-			if (! isset($attributes['div']['class'])) {
-				$attributes['div']['class'] = array('inline-block', 'like-icon');
-			}
-		}
+		list($outBeginDiv, $outEndDiv) = $this->__displayDiv($attributes, array('inline-block', 'like-icon'));
 
 		if (! isset($content['Like']['id'])) {
 			$content['Like'] = array(
@@ -218,29 +203,49 @@ class LikeHelper extends AppHelper {
 
 		//いいね
 		if (isset($setting['use_like']) && $setting['use_like']) {
-			if (isset($attributes['div'])) {
-				$output .= '<div class="' . implode(' ', (array)$attributes['div']['class']) . '">';
-			}
+			$output .= $outBeginDiv;
 			$output .= $this->_View->element('Likes.like_button', array('isLiked' => Like::IS_LIKE));
-			if (isset($attributes['div'])) {
-				$output .= '</div>';
-			}
+			$output .= $outEndDiv;
 		}
 
 		//わるいね
 		if (isset($setting['use_unlike']) && $setting['use_unlike']) {
-			if (isset($attributes['div'])) {
-				$output .= '<div class="' . implode(' ', (array)$attributes['div']['class']) . '">';
-			}
+			$output .= $outBeginDiv;
 			$output .= $this->_View->element('Likes.like_button', array('isLiked' => Like::IS_UNLIKE));
-			if (isset($attributes['div'])) {
-				$output .= '</div>';
-			}
+			$output .= $outEndDiv;
 		}
 
 		$output .= '</div>';
 
 		return $output;
+	}
+
+/**
+ * Get display <div> tag
+ *
+ * @param array $attributes Array of attributes and HTML arguments.
+ * @param array $defaultClass Array of default attributes class and HTML arguments.
+ * @return array <div> tag
+ */
+	private function __displayDiv($attributes, $defaultClass) {
+		$outBeginDiv = '';
+		$outEndDiv = '';
+
+		if (isset($attributes['div'])) {
+			if (! is_array($attributes['div'])) {
+				$attributes['div'] = (array)$attributes['div'];
+			}
+			if (! isset($attributes['div']['class'])) {
+				$attributes['div']['class'] = $defaultClass;
+			}
+			$outBeginDiv = '<div class="' . implode(' ', (array)$attributes['div']['class']) . '">';
+			$outEndDiv = '</div>';
+		} else {
+			$outBeginDiv = '';
+			$outEndDiv = '';
+		}
+
+		return array($outBeginDiv, $outEndDiv);
 	}
 
 }

@@ -29,23 +29,6 @@ class LikesController extends LikesAppController {
 	);
 
 /**
- * use components
- *
- * @var array
- */
-//	public $components = array(
-//		'NetCommons.NetCommonsFrame',
-//		'NetCommons.NetCommonsWorkflow',
-//		'NetCommons.NetCommonsRoomRole' => array(
-//			//コンテンツの権限設定
-//			//'allowedActions' => array(
-//			//	'contentCreatable' => array('add', 'reply', 'edit', 'delete'),
-//			//	'bbsPostCreatable' => array('add', 'reply', 'edit', 'delete')
-//			//),
-//		),
-//	);
-
-/**
  * beforeFilter
  *
  * @return void
@@ -62,7 +45,7 @@ class LikesController extends LikesAppController {
  */
 	public function like() {
 		if (! $this->request->isPost()) {
-			$this->_throwBadRequest();
+			$this->throwBadRequest();
 			return;
 		}
 
