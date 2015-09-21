@@ -71,11 +71,11 @@ class LikeHelper extends AppHelper {
 		if (isset($unlikeFieldName)) {
 			$likeAttributes['ng-click'] = 'useLike()';
 
-			$unlike = Hash::get($this->_View->request->data, $unlikeFieldName);
+			$like = Hash::get($this->_View->request->data, $likeFieldName);
 			$unlikeAttributes = array(
 				'type' => 'checkbox',
 				'label' => '<span class="glyphicon glyphicon-thumbs-down"> </span> ' . __d('likes', 'Use unlike button'),
-				'ng-disabled' => ! (int)$unlike
+				'ng-disabled' => ! (int)$like
 			);
 			$unlikeAttributes = Hash::merge($defaultAttributes, $unlikeAttributes, $attributes);
 		}
