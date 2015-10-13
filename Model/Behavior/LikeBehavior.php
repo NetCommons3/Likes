@@ -2,6 +2,34 @@
 /**
  * Like Behavior
  *
+ * 使用するプラグインのコンテンツモデルにLikeモデル、LikesUserモデルの
+ * アソシエーションを設定します。
+ * fieldオプションの指定がない場合は全データを取得しますが、
+ * fieldオプションを個別に指定する場合は、Likeモデルのfieldも明示的に指定してください。
+ * ```ContentModel
+ * class BbsArticle extends BbsesAppModel {
+ * 	public $actsAs = array(
+ * 		'Likes.Like'
+ * 	)
+ * }
+ * ```
+ * ```ContentController
+ * $bbsArticle = $this->BbsArticle->find('list');
+ * ```
+ * ```ResultSample
+ * $bbsArticle = array(
+ * 	'BbsArticle' => array(...),
+ * 	'Likes' => array(
+ * 		'id' => '999',
+ * 		'plugin_key' => 'abcdefg',
+ * 		'block_key' => 'abcdefg',
+ * 		'content_key' => 'abcdefg',
+ * 		'like_count' => '9',
+ * 		'unlike_count' => '9',
+ * 	)
+ * )
+ * ```
+ *
  * @author Shohei Nakajima <nakajimashouhei@gmail.com>
  * @link http://www.netcommons.org NetCommons Project
  * @license http://www.netcommons.org/license.txt NetCommons License
