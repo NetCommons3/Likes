@@ -2,21 +2,34 @@
 /**
  * Like Behavior
  *
+ * @author Shohei Nakajima <nakajimashouhei@gmail.com>
+ * @link http://www.netcommons.org NetCommons Project
+ * @license http://www.netcommons.org/license.txt NetCommons License
+ * @copyright Copyright 2014, NetCommons Project
+ */
+
+/**
+ * Like Behavior
+ *
  * 使用するプラグインのコンテンツモデルにLikeモデル、LikesUserモデルの
- * アソシエーションを設定します。
- * fieldオプションの指定がない場合は全データを取得しますが、
- * fieldオプションを個別に指定する場合は、Likeモデルのfieldも明示的に指定してください。
- * ```ContentModel
+ * アソシエーションを設定します。<br>
+ * fieldオプションの指定がない場合は全データを取得しますが、<br>
+ * fieldオプションを個別に指定する場合は、Likeモデルのfieldも明示的に指定してください。<br>
+ *
+ * #### ContentModel
+ * ```
  * class BbsArticle extends BbsesAppModel {
  * 	public $actsAs = array(
  * 		'Likes.Like'
  * 	)
  * }
  * ```
- * ```ContentController
+ * #### ContentController
+ * ```
  * $bbsArticle = $this->BbsArticle->find('list');
  * ```
- * ```ResultSample
+ * #### ResultSample
+ * ```
  * $bbsArticle = array(
  * 	'BbsArticle' => array(...),
  * 	'Likes' => array(
@@ -29,15 +42,6 @@
  * 	)
  * )
  * ```
- *
- * @author Shohei Nakajima <nakajimashouhei@gmail.com>
- * @link http://www.netcommons.org NetCommons Project
- * @license http://www.netcommons.org/license.txt NetCommons License
- * @copyright Copyright 2014, NetCommons Project
- */
-
-/**
- * Like Behavior
  *
  * @author Shohei Nakajima <nakajimashouhei@gmail.com>
  * @package NetCommons\Likes\Model\Behavior
