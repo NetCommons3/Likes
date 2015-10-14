@@ -14,6 +14,11 @@ App::uses('AppHelper', 'View/Helper');
 /**
  * Like Helper
  *
+ * イイネ！、ヤダネ！の画面表示機能を提供します。
+ * * イイネ！、ヤダネ！使用設定表示:[settingメソッド](#setting)
+ * * イイネ！、ヤダネ！表示のみ（クリックできない）:[displayメソッド](#display)
+ * * イイネ！、ヤダネ！ボタン表示:[buttonsメソッド](#buttons)
+ *
  * @author Shohei Nakajima <nakajimashouhei@gmail.com>
  * @package NetCommons\Likes\View\Helper
  */
@@ -48,6 +53,16 @@ class LikeHelper extends AppHelper {
 
 /**
  * Output use like setting element
+ *
+ * イイネ！、ヤダネ！使用設定HTMLを返します。<br>
+ * 使用有無のフィールド名を指定してください。<br>
+ * (フィールド名は、use_like,use_unlike固定で良いのでは？)
+ *
+ * #### Sample code
+ * ##### template file(ctp file)
+ * ```
+ * <?php echo $this->Like->setting('BbsSetting.use_like', 'BbsSetting.use_unlike');
+ * ```
  *
  * @param string $likeFieldName This should be "Modelname.fieldname" for use_like field
  * @param string $unlikeFieldName This should be "Modelname.fieldname" for use_unlike field
@@ -109,6 +124,16 @@ class LikeHelper extends AppHelper {
 /**
  * Output like and unlike display element
  *
+ * イイネ！、ヤダネ！表示HTMLを返します。(表示のみでクリックできません)<br>
+ * 設定データ配列、コンテンツデータ配列を指定してください。<br>
+ * 設定データ配列のuse_like,use_unlikeを判断し、コンテンツデータ配列のLike.unlike_countを表示します。
+ *
+ * #### Sample code
+ * ##### template file(ctp file)
+ * ```
+ * <?php echo $this->Like->buttons($bbsSetting, $bbsArticle); ?>
+ * ```
+ *
  * @param array $setting Array of use like setting data.
  * @param array $content Array of content data with like count.
  * @param array $attributes Array of attributes and HTML arguments.
@@ -136,6 +161,17 @@ class LikeHelper extends AppHelper {
 
 /**
  * Output like and unlike buttons element
+ *
+ * イイネ！、ヤダネ！ボタンHTMLを返します。<br>
+ * コンテンツモデル名、設定データ配列、コンテンツデータ配列を指定してください。<br>
+ * 設定データ配列のuse_like,use_unlikeを判断し、コンテンツデータ配列のLike.unlike_countを表示します。<br>
+ * コンテンツデータ配列のコンテンツモデル名.keyでカウントデータを更新します。
+ *
+ * #### Sample code
+ * ##### template file(ctp file)
+ * ```
+ * <?php echo $this->Like->buttons('BbsArticle', $bbsSetting, $bbsArticle); ?>
+ * ```
  *
  * @param array $model String of model name
  * @param array $setting Array of use like setting data.
