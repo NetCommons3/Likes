@@ -116,22 +116,19 @@ class LikeHelper extends AppHelper {
  */
 	public function display($setting, $content, $attributes = array()) {
 		$output = '';
-		list($outBeginDiv, $outEndDiv) = $this->__displayDiv($attributes, array('inline-block', 'like-icon', 'text-muted'));
 
 		//いいね
 		if (isset($setting['use_like']) && $setting['use_like']) {
-			$output .= $outBeginDiv;
-			$output .= '<span class="glyphicon glyphicon-thumbs-up"></span> ';
-			$output .= (int)Hash::get($content, 'Like.like_count');
-			$output .= $outEndDiv;
+			$element = '<span class="glyphicon glyphicon-thumbs-up"></span> ';
+			$element .= (int)Hash::get($content, 'Like.like_count');
+			$output .= $this->Html->div(array('inline-block', 'like-icon', 'text-muted'), $element, $attributes);
 		}
 
 		//わるいね
 		if (isset($setting['use_unlike']) && $setting['use_unlike']) {
-			$output .= $outBeginDiv;
-			$output .= '<span class="glyphicon glyphicon-thumbs-down"></span> ';
-			$output .= (int)Hash::get($content, 'Like.unlike_count');
-			$output .= $outEndDiv;
+			$element = '<span class="glyphicon glyphicon-thumbs-down"></span> ';
+			$element .= (int)Hash::get($content, 'Like.unlike_count');
+			$output .= $this->Html->div(array('inline-block', 'like-icon', 'text-muted'), $element, $attributes);
 		}
 
 		return $output;
@@ -152,8 +149,6 @@ class LikeHelper extends AppHelper {
 		if (isset($content['LikesUser']['id']) || $content[$model]['status'] !== WorkflowComponent::STATUS_PUBLISHED) {
 			return $this->display($setting, $content, $attributes);
 		}
-
-		list($outBeginDiv, $outEndDiv) = $this->__displayDiv($attributes, array('inline-block', 'like-icon'));
 
 		if (! isset($content['Like']['id'])) {
 			$content['Like'] = array(
@@ -203,49 +198,19 @@ class LikeHelper extends AppHelper {
 
 		//いいね
 		if (isset($setting['use_like']) && $setting['use_like']) {
-			$output .= $outBeginDiv;
-			$output .= $this->_View->element('Likes.like_button', array('isLiked' => Like::IS_LIKE));
-			$output .= $outEndDiv;
+			$output .= $this->Html->div(array('inline-block', 'like-icon'),
+					$this->_View->element('Likes.like_button', array('isLiked' => Like::IS_LIKE)), $attributes);
 		}
 
 		//わるいね
 		if (isset($setting['use_unlike']) && $setting['use_unlike']) {
-			$output .= $outBeginDiv;
-			$output .= $this->_View->element('Likes.like_button', array('isLiked' => Like::IS_UNLIKE));
-			$output .= $outEndDiv;
+			$output .= $this->Html->div(array('inline-block', 'like-icon'),
+					$this->_View->element('Likes.like_button', array('isLiked' => Like::IS_UNLIKE)), $attributes);
 		}
 
 		$output .= '</div>';
 
 		return $output;
-	}
-
-/**
- * Get display <div> tag
- *
- * @param array $attributes Array of attributes and HTML arguments.
- * @param array $defaultClass Array of default attributes class and HTML arguments.
- * @return array <div> tag
- */
-	private function __displayDiv($attributes, $defaultClass) {
-		$outBeginDiv = '';
-		$outEndDiv = '';
-
-		if (isset($attributes['div'])) {
-			if (! is_array($attributes['div'])) {
-				$attributes['div'] = (array)$attributes['div'];
-			}
-			if (! isset($attributes['div']['class'])) {
-				$attributes['div']['class'] = $defaultClass;
-			}
-			$outBeginDiv = '<div class="' . implode(' ', (array)$attributes['div']['class']) . '">';
-			$outEndDiv = '</div>';
-		} else {
-			$outBeginDiv = '';
-			$outEndDiv = '';
-		}
-
-		return array($outBeginDiv, $outEndDiv);
 	}
 
 }
