@@ -17,7 +17,7 @@
  * @package NetCommons\Likes\Config\Schema
  * @SuppressWarnings(PHPMD.LongVariable)
  */
-class AppSchema extends CakeSchema {
+class LikesSchema extends CakeSchema {
 
 /**
  * Database connection
