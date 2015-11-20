@@ -69,7 +69,7 @@ class LikeBehavior extends ModelBehavior {
  * SetUp behavior
  *
  * Likeモデル、LikesUserモデルのアソシエーションで、別モデル、別フィールド名を指定することがます。<br>
- * デフォルト値は、モデル名が呼び出し元名称(aliasが正しいと思う→要調査)、フィールド名が"key"になっています。
+ * デフォルト値は、モデル名が呼び出し元名称、フィールド名が"key"になっています。
  *
  * @param object $model instance of model
  * @param array $config array of configuration settings.
@@ -79,7 +79,7 @@ class LikeBehavior extends ModelBehavior {
 		if (isset($config['model'])) {
 			$this->__model = $config['model'];
 		} else {
-			$this->__model = $model->name;
+			$this->__model = $model->alias;
 		}
 
 		if (isset($config['field'])) {
@@ -87,54 +87,6 @@ class LikeBehavior extends ModelBehavior {
 		} else {
 			$this->__field = 'key';
 		}
-
-		parent::setup($model, $config);
-	}
-
-/**
- * beforeFind can be used to cancel find operations, or modify the query that will be executed.
- * By returning null/false you can abort a find. By returning an array you can modify/replace the query
- * that is going to be run.
- *
- * @param Model $model Model using this behavior
- * @param array $query Data used to execute this query, i.e. conditions, order, etc.
- * @return bool|array False or null will abort the operation. You can return an array to replace the
- *   $query that will be eventually run.
- */
-	public function beforeFind(Model $model, $query) {
-		$model->Like = ClassRegistry::init('Likes.Like');
-		$model->LikesUser = ClassRegistry::init('Likes.LikesUser');
-
-		$conditions = $query['conditions'];
-		if (is_array($query['conditions']) === false) {
-			return $query;
-		}
-
-		$columns = array();
-		if (! isset($query['fields'])) {
-			$columns = 'Like.*';
-		} else {
-			$columns = $query['fields'];
-		}
-
-		$columns = Hash::merge((array)$columns, array_keys($conditions));
-		// Like条件あったらJOIN
-		if (! preg_grep('/^Like\./', $columns) && ! preg_grep('/^LikesUser\./', $columns)) {
-			return $query;
-		}
-
-		if (! isset($query['fields'])) {
-			$query['fields'] = '*';
-		}
-		$query['joins'][] = array(
-			'table' => $model->Like->table,
-			'alias' => $model->Like->alias,
-			'type' => 'LEFT',
-			'conditions' => array(
-				'Like.plugin_key' => Inflector::underscore($model->plugin),
-				$this->__model . '.' . $this->__field . ' = ' . 'Like.content_key',
-			)
-		);
 
 		$likesUserConditions = array(
 			'Like.id = LikesUser.like_id',
@@ -144,12 +96,25 @@ class LikeBehavior extends ModelBehavior {
 		} else {
 			$likesUserConditions['LikesUser.session_key'] = CakeSession::id();
 		}
-		$query['joins'][] = array(
-			'table' => $model->LikesUser->table,
-			'alias' => $model->LikesUser->alias,
-			'type' => 'LEFT',
-			'conditions' => $likesUserConditions
-		);
-		return $query;
+
+		$model->bindModel(array(
+			'belongsTo' => array(
+				'Like' => array(
+					'className' => 'Likes.Like',
+					'foreignKey' => false,
+					'conditions' => array(
+						'Like.plugin_key' => Inflector::underscore($model->plugin),
+						$this->__model . '.' . $this->__field . ' = ' . 'Like.content_key',
+					),
+				),
+				'LikesUser' => array(
+					'className' => 'Likes.LikesUser',
+					'foreignKey' => false,
+					'conditions' => $likesUserConditions,
+				),
+			)
+		), false);
+
+		parent::setup($model, $config);
 	}
 }
