@@ -54,6 +54,11 @@ class LikesController extends LikesAppController {
 		}
 
 		$data = $this->data;
+		$like = $this->Like->find('first', array(
+			'recursive' => -1,
+			'conditions' => array('content_key' => $data['Like']['content_key'])
+		));
+		$data = Hash::merge($like, $data);
 		if ($this->Like->saveLike($data)) {
 			return;
 		}
