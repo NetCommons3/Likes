@@ -35,7 +35,6 @@ class TestLikesController extends LikesController {
  */
 	public $uses = array(
 		'Likes.Like',
-		//'Containers.Container',
 	);
 
 /**
@@ -53,7 +52,6 @@ class TestLikesController extends LikesController {
 /**
  * index method
  *
- * @param string $id boxId
  * @throws NotFoundException
  * @return void
  */
