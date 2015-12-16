@@ -51,12 +51,15 @@ class LikeExistsLikeTest extends NetCommonsModelTestCase {
  *
  * @param array $contentKey キー情報
  * @param string $expected 期待値
+ * @param int $userId ユーザーID
  * @dataProvider dataProviderExistsLike
  * @return void
  */
-	public function testExistsLike($contentKey, $expected) {
+	public function testExistsLike($contentKey, $expected, $userId = 0) {
 		$model = $this->_modelName;
 		$method = $this->_methodName;
+
+		Current::$current['User']['id'] = $userId;
 
 		//テスト実行
 		$result = $this->$model->$method($contentKey);
@@ -70,6 +73,7 @@ class LikeExistsLikeTest extends NetCommonsModelTestCase {
  * #### 戻り値
  *  - contentKey 取得データ
  *  - expected 期待値
+ *  - userId ユーザーID
  *
  * @return array
  */
@@ -77,7 +81,7 @@ class LikeExistsLikeTest extends NetCommonsModelTestCase {
 		return array(
 			array( 'aaa', 0),
 			array( 'testcontent', 1),
-			array( 'testcontent', 1),
+			array( 'testcontent', 1, 1),
 		);
 	}
 
