@@ -8,6 +8,8 @@
  * @copyright Copyright 2014, NetCommons Project
  */
 
+App::uses('NetCommonsTestSuite', 'NetCommons.TestSuite');
+
 /**
  * Likes All Test Suite
  *
@@ -15,12 +17,13 @@
  * @package NetCommons\Likes\Test\Case
  * @codeCoverageIgnore
  */
-class AllLikesTest extends CakeTestSuite {
+class AllLikesTest extends NetCommonsTestSuite {
 
 /**
  * All test suite
  *
  * @return CakeTestSuite
+ * @codeCoverageIgnore
  */
 	public static function suite() {
 		$plugin = preg_replace('/^All([\w]+)Test$/', '$1', __CLASS__);
