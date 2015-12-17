@@ -59,7 +59,7 @@ class TestLikesController extends LikesController {
 /**
  * index method
  *
- * @throws NotFoundExceptionl
+ * @throws NotFoundException
  * @return void
  */
 	public function index() {
