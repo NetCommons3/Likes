@@ -20,6 +20,15 @@ App::uses('LikesController', 'Likes.Controller');
 class TestLikesController extends LikesController {
 
 /**
+ * use component
+ *
+ * @var array
+ */
+	public $components = array(
+		'Security' => false
+	);
+
+/**
  * use helpers
  *
  * @var array
@@ -45,14 +54,12 @@ class TestLikesController extends LikesController {
 	public function beforeFilter() {
 		parent::beforeFilter();
 		$this->Auth->allow('like');
-		$this->Security->validatePost = false;
-		$this->Security->csrfCheck = false;
 	}
 
 /**
  * index method
  *
- * @throws NotFoundException
+ * @throws NotFoundExceptionl
  * @return void
  */
 	public function index() {
