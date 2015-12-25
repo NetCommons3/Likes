@@ -107,9 +107,6 @@ class Like extends LikesAppModel {
 				),
 			),
 		));
-		if (! parent::beforeValidate($options)) {
-			return false;
-		}
 
 		if (isset($this->data['LikesUser'])) {
 			$this->LikesUser->set($this->data['LikesUser']);
@@ -118,6 +115,7 @@ class Like extends LikesAppModel {
 				return false;
 			}
 		}
+		return parent::beforeValidate($options);
 	}
 
 /**

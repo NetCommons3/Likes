@@ -1,6 +1,6 @@
 <?php
 /**
- * RssReadersController Test Case
+ * LikesController Test Case
  *
  * @author Noriko Arai <arai@nii.ac.jp>
  * @author Shohei Nakajima <nakajimashouhei@gmail.com>
@@ -9,22 +9,16 @@
  * @copyright Copyright 2014, NetCommons Project
  */
 
-App::uses('NetCommonsFrameComponent', 'NetCommons.Controller/Component');
-App::uses('NetCommonsBlockComponent', 'NetCommons.Controller/Component');
-App::uses('NetCommonsRoomRoleComponent', 'NetCommons.Controller/Component');
-App::uses('YAControllerTestCase', 'NetCommons.TestSuite');
-App::uses('LikesControllerTest', 'Likes.Test/Case/Controller');
-App::uses('AuthGeneralControllerTest', 'AuthGeneral.Test/Case/Controller');
-App::uses('Like', 'Likes.Model');
+App::uses('NetCommonsControllerTestCase', 'NetCommons.TestSuite');
 
 /**
- * RssReadersController Test Case
+ * LikesController Test Case
  *
  * @author Shohei Nakajima <nakajimashouhei@gmail.com>
- * @package NetCommons\RssReaders\Test\Case\Controller
+ * @package NetCommons\Likes\Test\Case\Controller
  * @SuppressWarnings(PHPMD.LongVariable)
  */
-class LikesControllerTest extends YAControllerTestCase {
+class LikesControllerTest extends NetCommonsControllerTestCase {
 
 /**
  * Fixtures
@@ -33,7 +27,47 @@ class LikesControllerTest extends YAControllerTestCase {
  */
 	public $fixtures = array(
 		'plugin.likes.like',
+		'plugin.likes.likes_user',
 	);
+
+/**
+ * Plugin name
+ *
+ * @var array
+ */
+	public $plugin = 'test_likes';
+
+/**
+ * Controller name
+ *
+ * @var string
+ */
+	protected $_controller = 'test_likes';
+
+/**
+ * テストDataの取得
+ *
+ * @return array
+ */
+	private function __getData() {
+		$data = array(
+			'Frame' => array(
+				'id' => '1',
+			),
+			'Like' => array(
+				'plugin_key' => 'bbses',
+				'block_key' => 'block_1',
+				'content_key' => 'test',
+			),
+			'LikesUser' => array(
+				'like_id' => 1,
+				'user_id' => 1,
+				'is_liked' => 0,
+			)
+		);
+
+		return $data;
+	}
 
 /**
  * setUp method
@@ -42,7 +76,9 @@ class LikesControllerTest extends YAControllerTestCase {
  */
 	public function setUp() {
 		parent::setUp();
-		Configure::write('Config.language', 'ja');
+
+		NetCommonsControllerTestCase::loadTestPlugin($this, 'Likes', 'TestLikes');
+		$this->generateNc(Inflector::camelize($this->_controller));
 	}
 
 /**
@@ -51,16 +87,99 @@ class LikesControllerTest extends YAControllerTestCase {
  * @return void
  */
 	public function tearDown() {
-		Configure::write('Config.language', null);
-		CakeSession::write('Auth.User', null);
 		parent::tearDown();
 	}
 
 /**
- * testIndex method
+ * LikeアクションのGETテスト
  *
+ * @param array $urlOptions URLオプション
+ * @param array $assert テストの期待値
+ * @param string|null $exception Exception
+ * @param string $return testActionの実行後の結果
+ * @dataProvider dataProviderLikeGet
  * @return void
  */
-	public function testIndex() {
+	public function testLikeGet($urlOptions, $assert, $exception = null, $return = 'view') {
+		//テスト実施
+		$url = Hash::merge(array(
+			'plugin' => $this->plugin,
+			'controller' => $this->_controller,
+			'action' => 'like',
+		), $urlOptions);
+
+		$this->_testGetAction($url, $assert, $exception, $return);
 	}
+
+/**
+ * likeアクションのGETテスト用DataProvider
+ *
+ * ### 戻り値
+ *  - urlOptions: URLオプション
+ *  - assert: テストの期待値
+ *  - exception: Exception
+ *  - return: testActionの実行後の結果
+ *
+ * @return array
+ */
+	public function dataProviderLikeGet() {
+		$results = array();
+		$results[0] = array(
+			'urlOptions' => array(),
+			'assert' => null, 'exception' => 'BadRequestException',
+		);
+		$results[1] = array(
+			'urlOptions' => array(),
+			'assert' => null,
+			'exception' => 'BadRequestException', 'return' => 'json',
+		);
+		return $results;
+	}
+
+/**
+ * likeアクションのPOSTテスト
+ *
+ * @param array $data POSTデータ
+ * @param array $urlOptions URLオプション
+ * @param string|null $exception Exception
+ * @param string $return testActionの実行後の結果
+ * @dataProvider dataProviderLikePost
+ * @return void
+ */
+	public function testLikePost($data, $urlOptions, $exception = null, $return = 'view') {
+		$this->_testPostAction('post', $data, Hash::merge(array('action' => 'index'), $urlOptions), $exception, $return);
+	}
+
+/**
+ * LikeアクションのPOSTテスト用DataProvider
+ *
+ * ### 戻り値
+ *  - data: 登録データ
+ *  - urlOptions: URLオプション
+ *  - exception: Exception
+ *  - return: testActionの実行後の結果
+ *
+ * @return array
+ */
+	public function dataProviderLikePost() {
+		$data1 = $this->__getData();
+		$data2 = $this->__getData();
+		$data2['Like']['content_key'] = '';
+		$data3 = $this->__getData();
+		$data3['Like']['content_key'] = 'testcontent';
+
+		return array(
+			array(
+				'data' => $data1, 'urlOptions' => array(),
+			),
+			array(
+				'data' => $data2, 'urlOptions' => array(),
+			),
+			array(
+				'data' => $data3, 'urlOptions' => array(),
+			),
+
+		);
+	}
+
 }

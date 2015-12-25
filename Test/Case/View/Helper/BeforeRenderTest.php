@@ -1,8 +1,6 @@
 <?php
 /**
- * Announcement Model Test Case
- *
- * @property Announcement $Announcement
+ * LikeHelper Test Case
  *
  * @author Noriko Arai <arai@nii.ac.jp>
  * @author Shohei Nakajima <nakajimashouhei@gmail.com>
@@ -11,18 +9,17 @@
  * @copyright Copyright 2014, NetCommons Project
  */
 
-App::uses('Like', 'Likes.Model');
-App::uses('NetCommonsBlockComponent', 'NetCommons.Controller/Component');
-App::uses('NetCommonsRoomRoleComponent', 'NetCommons.Controller/Component');
-App::uses('YACakeTestCase', 'NetCommons.TestSuite');
+App::uses('View', 'View');
+App::uses('LikeHelper', 'Likes.View/Helper');
+App::uses('NetCommonsCakeTestCase', 'NetCommons.TestSuite');
 
 /**
- * Announcement Model Test Case
+ * beforeRender for LikeHelper Test Case
  *
  * @author Shohei Nakajima <nakajimashouhei@gmail.com>
- * @package NetCommons\Announcements\Test\Case\Model
+ * @package NetCommons\Likes\Test\Case\View\Helper
  */
-class LikeTest extends YACakeTestCase {
+class LikeHelperBeforeRenderTest extends NetCommonsCakeTestCase {
 
 /**
  * Fixtures
@@ -31,6 +28,7 @@ class LikeTest extends YACakeTestCase {
  */
 	public $fixtures = array(
 		'plugin.likes.like',
+		'plugin.likes.likes_user',
 	);
 
 /**
@@ -40,7 +38,8 @@ class LikeTest extends YACakeTestCase {
  */
 	public function setUp() {
 		parent::setUp();
-		$this->Like = ClassRegistry::init('Likes.Like');
+		$View = new View();
+		$this->Like = new LikeHelper($View);
 	}
 
 /**
@@ -54,10 +53,13 @@ class LikeTest extends YACakeTestCase {
 	}
 
 /**
- * testIndex method
+ * testBeforeRender method
  *
  * @return void
  */
-	public function testIndex() {
+	public function testBeforeRender() {
+		$viewFile = array();
+		$this->Like->beforeRender($viewFile);
 	}
+
 }

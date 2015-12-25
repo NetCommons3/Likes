@@ -49,7 +49,7 @@ class LikeFixture extends CakeTestFixture {
 			'id' => 1,
 			'plugin_key' => 'Lorem ipsum dolor sit amet',
 			'block_key' => 'Lorem ipsum dolor sit amet',
-			'content_key' => 'Lorem ipsum dolor sit amet',
+			'content_key' => 'testcontent',
 			'like_count' => 1,
 			'unlike_count' => 1,
 			'created_user' => 1,
