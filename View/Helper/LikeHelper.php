@@ -225,7 +225,7 @@ class LikeHelper extends AppHelper {
 		unset($hiddenFields['LikesUser.is_liked']);
 		$hiddenFields = array_keys($hiddenFields);
 
-		$this->_View->request->data = $data;
+		$this->_View->request->data = Hash::merge($this->_View->request->data, $data);
 		$tokens = $this->Token->getToken('Like', '/likes/likes/like.json', $tokenFields, $hiddenFields);
 		$data += $tokens;
 
