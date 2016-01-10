@@ -44,7 +44,7 @@ class LikesController extends LikesAppController {
  * @return void
  */
 	public function like() {
-		if (! $this->request->isPost()) {
+		if (! $this->request->is('post')) {
 			$this->throwBadRequest();
 			return;
 		}
