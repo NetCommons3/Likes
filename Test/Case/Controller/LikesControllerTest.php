@@ -75,19 +75,8 @@ class LikesControllerTest extends NetCommonsControllerTestCase {
  * @return void
  */
 	public function setUp() {
-		parent::setUp();
-
 		NetCommonsControllerTestCase::loadTestPlugin($this, 'Likes', 'TestLikes');
-		$this->generateNc(Inflector::camelize($this->_controller));
-	}
-
-/**
- * tearDown method
- *
- * @return void
- */
-	public function tearDown() {
-		parent::tearDown();
+		parent::setUp();
 	}
 
 /**

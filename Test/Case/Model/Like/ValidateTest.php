@@ -1,6 +1,6 @@
 <?php
 /**
- * Like::saveLike()のテスト
+ * Like::validates()のテスト
  *
  * @property Like $Like
  *
@@ -11,15 +11,15 @@
  * @copyright Copyright 2014, NetCommons Project
  */
 
-App::uses('NetCommonsSaveTest', 'NetCommons.TestSuite');
+App::uses('NetCommonsValidateTest', 'NetCommons.TestSuite');
 
 /**
- * Like::saveLike()のテスト
+ * Like::validates()のテスト
  *
  * @author Shohei Nakajima <nakajimashouhei@gmail.com>
  * @package NetCommons\Likes\Test\Case\Model\Like
  */
-class LikeSaveLikeTest extends NetCommonsSaveTest {
+class LikeValidateTest extends NetCommonsValidateTest {
 
 /**
  * Plugin name
@@ -50,7 +50,7 @@ class LikeSaveLikeTest extends NetCommonsSaveTest {
  *
  * @var array
  */
-	protected $_methodName = 'saveLike';
+	protected $_methodName = 'validates';
 
 /**
  * テストDataの取得

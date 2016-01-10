@@ -11,7 +11,6 @@
  * @copyright Copyright 2014, NetCommons Project
  */
 
-App::uses('LikesUser', 'Likes.Model');
 App::uses('NetCommonsModelTestCase', 'NetCommons.TestSuite');
 
 /**
@@ -21,6 +20,13 @@ App::uses('NetCommonsModelTestCase', 'NetCommons.TestSuite');
  * @package NetCommons\Likes\Test\Case\Model\LikesUser
  */
 class LikesUserBeforeValidateTest extends NetCommonsModelTestCase {
+
+/**
+ * Plugin name
+ *
+ * @var array
+ */
+	public $plugin = 'likes';
 
 /**
  * Fixtures

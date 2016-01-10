@@ -11,10 +11,6 @@
  * @copyright Copyright 2014, NetCommons Project
  */
 
-App::uses('Like', 'Likes.Model');
-App::uses('LikesUser', 'Likes.Model');
-App::uses('TestLikes', 'Likes.Model');
-
 App::uses('NetCommonsModelTestCase', 'NetCommons.TestSuite');
 App::uses('NetCommonsControllerTestCase', 'NetCommons.TestSuite');
 /**
