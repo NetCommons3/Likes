@@ -2,6 +2,7 @@
 /**
  * Likes All Test Suite
  *
+ * @author Noriko Arai <arai@nii.ac.jp>
  * @author Shohei Nakajima <nakajimashouhei@gmail.com>
  * @link http://www.netcommons.org NetCommons Project
  * @license http://www.netcommons.org/license.txt NetCommons License
@@ -22,7 +23,7 @@ class AllLikesTest extends NetCommonsTestSuite {
 /**
  * All test suite
  *
- * @return CakeTestSuite
+ * @return NetCommonsTestSuite
  * @codeCoverageIgnore
  */
 	public static function suite() {
