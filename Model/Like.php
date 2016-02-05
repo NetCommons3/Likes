@@ -157,6 +157,7 @@ class Like extends LikesAppModel {
 			$update = array(
 				$this->alias . '.like_count' => $likeCount,
 				$this->alias . '.unlike_count' => $unlikeCount,
+				$this->alias . '.weight' => $likeCount - $unlikeCount,
 			);
 			$conditions = array(
 				$this->alias . '.id' => $this->data[$this->alias]['id']
