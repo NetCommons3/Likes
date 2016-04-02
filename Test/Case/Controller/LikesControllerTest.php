@@ -55,7 +55,7 @@ class LikesControllerTest extends NetCommonsControllerTestCase {
 				'id' => '1',
 			),
 			'Like' => array(
-				'plugin_key' => 'bbses',
+				'plugin_key' => 'test_likes',
 				'block_key' => 'block_1',
 				'content_key' => 'test',
 			),
@@ -77,6 +77,21 @@ class LikesControllerTest extends NetCommonsControllerTestCase {
 	public function setUp() {
 		NetCommonsControllerTestCase::loadTestPlugin($this, 'Likes', 'TestLikes');
 		parent::setUp();
+
+		//ログイン
+		TestAuthGeneral::login($this);
+	}
+
+/**
+ * tearDown method
+ *
+ * @return void
+ */
+	public function tearDown() {
+		//ログアウト
+		TestAuthGeneral::logout($this);
+
+		parent::tearDown();
 	}
 
 /**
@@ -135,8 +150,8 @@ class LikesControllerTest extends NetCommonsControllerTestCase {
  * @dataProvider dataProviderLikePost
  * @return void
  */
-	public function testLikePost($data, $urlOptions, $exception = null, $return = 'view') {
-		$this->_testPostAction('post', $data, Hash::merge(array('action' => 'index'), $urlOptions), $exception, $return);
+	public function testLikePost($data, $urlOptions, $exception = null, $return = 'json') {
+		$this->_testPostAction('post', $data, Hash::merge(array('action' => 'like'), $urlOptions), $exception, $return);
 	}
 
 /**
@@ -162,13 +177,27 @@ class LikesControllerTest extends NetCommonsControllerTestCase {
 				'data' => $data1, 'urlOptions' => array(),
 			),
 			array(
-				'data' => $data2, 'urlOptions' => array(),
+				'data' => $data2, 'urlOptions' => array(), 'exception' => 'BadRequestException',
 			),
 			array(
 				'data' => $data3, 'urlOptions' => array(),
 			),
-
 		);
+	}
+
+/**
+ * LikeアクションのExistsテスト
+ *
+ * @return void
+ */
+	public function testLikeExists() {
+		$data = $this->dataProviderLikePost()[2]['data'];
+
+		$this->_testPostAction('post', $data, array('action' => 'like'), null, 'json');
+
+		$this->generateNc(Inflector::camelize($this->_controller));
+		$this->_mockForReturnTrue('Likes.Like', 'saveLike', 0);
+		$this->_testPostAction('post', $data, array('action' => 'like'), null, 'json');
 	}
 
 }

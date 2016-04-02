@@ -62,8 +62,8 @@ class TestLikesController extends LikesController {
  * @throws NotFoundException
  * @return void
  */
-	public function index() {
-		$this->like();
+	public function like() {
+		parent::like();
 	}
 
 }
