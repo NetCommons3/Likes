@@ -78,6 +78,7 @@ class LikeHelper extends AppHelper {
 			'div' => array('class' => 'form-inline'),
 			'label' => false,
 			'legend' => false,
+			'escape' => false,
 		);
 		$likeAttributes = array(
 			'type' => 'checkbox',
@@ -106,13 +107,13 @@ class LikeHelper extends AppHelper {
 
 		//いいねの出力
 		$output .= '<div class="col-xs-12">';
-		$output .= $this->Form->input($likeFieldName, $likeAttributes);
+		$output .= $this->NetCommonsForm->checkbox($likeFieldName, $likeAttributes);
 		$output .= '</div>';
 
 		//わるいねの出力
 		if (isset($unlikeFieldName)) {
 			$output .= '<div class="col-xs-11 col-xs-offset-1">';
-			$output .= $this->Form->input($unlikeFieldName, $unlikeAttributes);
+			$output .= $this->NetCommonsForm->checkbox($unlikeFieldName, $unlikeAttributes);
 			$output .= '</div>';
 		}
 
