@@ -75,7 +75,6 @@ class LikeHelper extends AppHelper {
 		//属性の設定
 		$defaultAttributes = array(
 			'error' => false,
-			'div' => array('class' => 'form-inline'),
 			'label' => false,
 			'legend' => false,
 			'escape' => false,
