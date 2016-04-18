@@ -116,7 +116,7 @@ class LikeHelper extends AppHelper {
 
 		//わるいねの出力
 		if (isset($unlikeFieldName)) {
-			$output .= '<div class="col-xs-11 col-xs-offset-1">';
+			$output .= '<div class="form-inline col-xs-11 col-xs-offset-1">';
 			$output .= $this->NetCommonsForm->checkbox($unlikeFieldName, $unlikeAttributes);
 			$output .= '</div>';
 		}
