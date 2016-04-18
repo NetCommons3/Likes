@@ -111,7 +111,9 @@ class Like extends LikesAppModel {
 		if (isset($this->data['LikesUser'])) {
 			$this->LikesUser->set($this->data['LikesUser']);
 			if (! $this->LikesUser->validates()) {
-				$this->validationErrors = Hash::merge($this->validationErrors, $this->LikesUser->validationErrors);
+				$this->validationErrors = Hash::merge(
+					$this->validationErrors, $this->LikesUser->validationErrors
+				);
 				return false;
 			}
 		}

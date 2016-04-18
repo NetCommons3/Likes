@@ -75,13 +75,14 @@ class LikeHelper extends AppHelper {
 		//属性の設定
 		$defaultAttributes = array(
 			'error' => false,
-			'div' => array('class' => 'form-inline'),
 			'label' => false,
 			'legend' => false,
+			'escape' => false,
 		);
 		$likeAttributes = array(
 			'type' => 'checkbox',
-			'label' => '<span class="glyphicon glyphicon-thumbs-up"> </span> ' . __d('likes', 'Use like button')
+			'label' => '<span class="glyphicon glyphicon-thumbs-up"></span> ' .
+						__d('likes', 'Use like button')
 		);
 		if (isset($unlikeFieldName)) {
 			$likeAttributes['ng-click'] = 'useLike()';
@@ -89,7 +90,8 @@ class LikeHelper extends AppHelper {
 			$like = Hash::get($this->_View->request->data, $likeFieldName);
 			$unlikeAttributes = array(
 				'type' => 'checkbox',
-				'label' => '<span class="glyphicon glyphicon-thumbs-down"> </span> ' . __d('likes', 'Use unlike button'),
+				'label' => '<span class="glyphicon glyphicon-thumbs-down"></span> ' .
+							__d('likes', 'Use unlike button'),
 				'ng-disabled' => ! (int)$like
 			);
 			$unlikeAttributes = Hash::merge($defaultAttributes, $unlikeAttributes, $attributes);
@@ -99,20 +101,23 @@ class LikeHelper extends AppHelper {
 		//共通DIVの出力
 		if (isset($unlikeFieldName)) {
 			$output .= '<div class="row form-group" ng-controller="LikeSettings" ' .
-							'ng-init="initialize(\'' . $this->domId($likeFieldName) . '\', \'' . $this->domId($unlikeFieldName) . '\')">';
+							'ng-init="initialize(' .
+								'\'' . $this->domId($likeFieldName) . '\', ' .
+								'\'' . $this->domId($unlikeFieldName) . '\')' .
+						'">';
 		} else {
 			$output .= '<div class="row form-group">';
 		}
 
 		//いいねの出力
 		$output .= '<div class="col-xs-12">';
-		$output .= $this->Form->input($likeFieldName, $likeAttributes);
+		$output .= $this->NetCommonsForm->checkbox($likeFieldName, $likeAttributes);
 		$output .= '</div>';
 
 		//わるいねの出力
 		if (isset($unlikeFieldName)) {
 			$output .= '<div class="col-xs-11 col-xs-offset-1">';
-			$output .= $this->Form->input($unlikeFieldName, $unlikeAttributes);
+			$output .= $this->NetCommonsForm->checkbox($unlikeFieldName, $unlikeAttributes);
 			$output .= '</div>';
 		}
 
@@ -146,14 +151,18 @@ class LikeHelper extends AppHelper {
 		if (isset($setting['use_like']) && $setting['use_like']) {
 			$element = '<span class="glyphicon glyphicon-thumbs-up"></span> ';
 			$element .= (int)Hash::get($content, 'Like.like_count');
-			$output .= $this->Html->div(array('inline-block', 'like-icon', 'text-muted'), $element, $attributes);
+			$output .= $this->Html->div(
+						array('inline-block', 'like-icon', 'text-muted'), $element, $attributes
+					);
 		}
 
 		//わるいね
 		if (isset($setting['use_unlike']) && $setting['use_unlike']) {
 			$element = '<span class="glyphicon glyphicon-thumbs-down"></span> ';
 			$element .= (int)Hash::get($content, 'Like.unlike_count');
-			$output .= $this->Html->div(array('inline-block', 'like-icon', 'text-muted'), $element, $attributes);
+			$output .= $this->Html->div(
+						array('inline-block', 'like-icon', 'text-muted'), $element, $attributes
+					);
 		}
 
 		return $output;
@@ -182,7 +191,8 @@ class LikeHelper extends AppHelper {
 	public function buttons($model, $setting, $content, $attributes = array()) {
 		$output = '';
 
-		if (isset($content['LikesUser']['id']) || $content[$model]['status'] !== WorkflowComponent::STATUS_PUBLISHED) {
+		if (isset($content['LikesUser']['id']) ||
+				$content[$model]['status'] !== WorkflowComponent::STATUS_PUBLISHED) {
 			return $this->display($setting, $content, $attributes);
 		}
 
@@ -235,13 +245,13 @@ class LikeHelper extends AppHelper {
 		//いいね
 		if (isset($setting['use_like']) && $setting['use_like']) {
 			$output .= $this->Html->div(array('inline-block', 'like-icon'),
-					$this->_View->element('Likes.like_button', array('isLiked' => Like::IS_LIKE)), $attributes);
+					$this->_View->element('Likes.like_button', ['isLiked' => Like::IS_LIKE]), $attributes);
 		}
 
 		//わるいね
 		if (isset($setting['use_unlike']) && $setting['use_unlike']) {
 			$output .= $this->Html->div(array('inline-block', 'like-icon'),
-					$this->_View->element('Likes.like_button', array('isLiked' => Like::IS_UNLIKE)), $attributes);
+					$this->_View->element('Likes.like_button', ['isLiked' => Like::IS_UNLIKE]), $attributes);
 		}
 
 		$output .= '</div>';
