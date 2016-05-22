@@ -64,7 +64,7 @@ NetCommonsApp.factory('LikesSave', ['$http', '$q', function($http, $q) {
  * @param {string} Controller name
  * @param {function($scope, LikesSave)} Controller
  */
-NetCommonsApp.controller('Likes', function($scope, LikesSave) {
+NetCommonsApp.controller('Likes', ['$scope', 'LikesSave', function($scope, LikesSave) {
 
   /**
    * Request parameters
@@ -118,7 +118,7 @@ NetCommonsApp.controller('Likes', function($scope, LikesSave) {
           //error condition
         });
   };
-});
+}]);
 
 
 /**
@@ -127,7 +127,7 @@ NetCommonsApp.controller('Likes', function($scope, LikesSave) {
  * @param {string} Controller name
  * @param {function($scope)} Controller
  */
-NetCommonsApp.controller('LikeSettings', function($scope) {
+NetCommonsApp.controller('LikeSettings', ['$scope', function($scope) {
 
   /**
    * initialize
@@ -157,4 +157,4 @@ NetCommonsApp.controller('LikeSettings', function($scope) {
       unlikeElement[0].checked = false;
     }
   };
-});
+}]);
