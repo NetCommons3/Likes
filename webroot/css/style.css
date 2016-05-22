@@ -6,11 +6,11 @@
  * @license http://www.netcommons.org/license.txt NetCommons License
  */
 
-.btn-likes {
-	margin: 2px;
-	padding: 0px;
-	border: 0px;
-}
 .like-icon {
 	margin-right: 16px;
+	display: inline-block;
+	line-height: 1;
+}
+.like-icon:last-child {
+	margin-right: 0px;
 }

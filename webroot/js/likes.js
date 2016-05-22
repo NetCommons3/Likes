@@ -94,6 +94,7 @@ NetCommonsApp.controller('Likes', ['$scope', 'LikesSave', function($scope, Likes
   $scope.initialize = function(data, options) {
     $scope.data = data;
     $scope.options = options;
+    $scope.options.disabled = false;
   };
 
   /**
@@ -103,11 +104,16 @@ NetCommonsApp.controller('Likes', ['$scope', 'LikesSave', function($scope, Likes
    */
   $scope.save = function(isLiked) {
     $scope.data['LikesUser']['is_liked'] = isLiked;
+    if ($scope.options.disabled) {
+      return;
+    }
+    $scope.options.disabled = true;
+    $scope.sending = true;
 
     LikesSave($scope.data)
       .success(function(data) {
+          $scope.sending = false;
           //success condition
-          $scope.options.disabled = true;
           if (isLiked) {
             $scope.options['likeCount'] = $scope.options['likeCount'] + 1;
           } else {
@@ -116,6 +122,7 @@ NetCommonsApp.controller('Likes', ['$scope', 'LikesSave', function($scope, Likes
         })
       .error(function(data, status) {
           //error condition
+          $scope.sending = false;
         });
   };
 }]);
