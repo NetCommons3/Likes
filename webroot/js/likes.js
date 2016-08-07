@@ -10,19 +10,19 @@
  * @param {string} Controller name
  * @param {function('$http', '$q')} Controller
  */
-NetCommonsApp.factory('LikesSave', ['$http', '$q', function($http, $q) {
+NetCommonsApp.factory('LikesSave', ['$http', '$q', 'NC3_URL', function($http, $q, NC3_URL) {
   return function(post) {
 
     var deferred = $q.defer();
     var promise = deferred.promise;
 
-    $http.get('/net_commons/net_commons/csrfToken.json')
+    $http.get(NC3_URL + '/net_commons/net_commons/csrfToken.json')
       .success(function(token) {
           post._Token.key = token.data._Token.key;
 
           //POSTリクエスト
           $http.post(
-              '/likes/likes/like.json',
+              NC3_URL + '/likes/likes/like.json',
               $.param({_method: 'POST', data: post}),
               {cache: false,
                 headers:
