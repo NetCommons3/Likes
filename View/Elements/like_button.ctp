@@ -9,7 +9,7 @@
  */
 ?>
 
-<a href="#" ng-hide="(options.disabled && !sending)"
+<a href="" ng-hide="(options.disabled && !sending)"
 		ng-class="{'text-muted':options.disabled}"
 		ng-click="save(<?php echo $isLiked; ?>)" ng-cloak>
 	<?php if ($isLiked === Like::IS_LIKE) : ?>
