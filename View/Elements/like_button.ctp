@@ -19,7 +19,7 @@
 	<?php endif; ?>
 </a>
 
-<span class="text-muted" ng-show="(options.disabled && !sending)">
+<span class="text-muted" ng-show="(options.disabled && !sending)" ng-cloak>
 	<?php if ($isLiked === Like::IS_LIKE) : ?>
 		<span class="glyphicon glyphicon-thumbs-up"></span> {{options.likeCount}}
 	<?php else : ?>
