@@ -17,7 +17,7 @@ NetCommonsApp.factory('LikesSave', ['$http', '$q', 'NC3_URL', function($http, $q
     var promise = deferred.promise;
 
     $http.get(NC3_URL + '/net_commons/net_commons/csrfToken.json')
-      .success(function(token) {
+        .success(function(token) {
           post._Token.key = token.data._Token.key;
 
           //POSTリクエスト
@@ -38,7 +38,7 @@ NetCommonsApp.factory('LikesSave', ['$http', '$q', 'NC3_URL', function($http, $q
                 deferred.reject(data, status);
               });
         })
-      .error(function(data, status) {
+        .error(function(data, status) {
           //Token error condition
           deferred.reject(data, status);
         });
@@ -111,7 +111,7 @@ NetCommonsApp.controller('Likes', ['$scope', 'LikesSave', function($scope, Likes
     $scope.sending = true;
 
     LikesSave($scope.data)
-      .success(function(data) {
+        .success(function(data) {
           $scope.sending = false;
           //success condition
           if (isLiked) {
@@ -120,7 +120,7 @@ NetCommonsApp.controller('Likes', ['$scope', 'LikesSave', function($scope, Likes
             $scope.options['unlikeCount'] = $scope.options['unlikeCount'] + 1;
           }
         })
-      .error(function(data, status) {
+        .error(function(data, status) {
           //error condition
           $scope.sending = false;
         });
