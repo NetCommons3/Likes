@@ -66,11 +66,9 @@ class LikeExistsLikeTest extends NetCommonsModelTestCase {
 		$method = $this->_methodName;
 
 		Current::$current['User']['id'] = $userId;
-var_dump('testExistsLike Start');
 
 		//テスト実行
 		$result = $this->$model->$method($contentKey);
-var_dump('testExistsLike End');
 
 		$this->assertEquals($result, $expected);
 	}
