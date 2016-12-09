@@ -204,6 +204,8 @@ class Like extends LikesAppModel {
 				),
 			)
 		));
+
+		var_dump($joinConditions);
 		return (bool)$count;
 	}
 
