@@ -17,7 +17,8 @@ NetCommonsApp.factory('LikesSave', ['$http', '$q', 'NC3_URL', function($http, $q
     var promise = deferred.promise;
 
     $http.get(NC3_URL + '/net_commons/net_commons/csrfToken.json')
-        .success(function(token) {
+        .then(function(response) {
+          var token = response.data;
           post._Token.key = token.data._Token.key;
 
           //POSTリクエスト
@@ -28,18 +29,23 @@ NetCommonsApp.factory('LikesSave', ['$http', '$q', 'NC3_URL', function($http, $q
                 headers:
                     {'Content-Type': 'application/x-www-form-urlencoded'}
               }
-          )
-          .success(function(data) {
+          ).then(
+          function(response) {
                 //success condition
+                var data = response.data;
                 deferred.resolve(data);
-              })
-          .error(function(data, status) {
+              },
+          function(response) {
                 //error condition
+                var data = response.data;
+                var status = response.status;
                 deferred.reject(data, status);
               });
-        })
-        .error(function(data, status) {
+        },
+        function(response) {
           //Token error condition
+          var data = response.data;
+          var status = response.status;
           deferred.reject(data, status);
         });
 
