@@ -31,16 +31,16 @@ NetCommonsApp.factory('LikesSave', ['$http', '$q', 'NC3_URL', function($http, $q
               }
           ).then(
           function(response) {
-            //success condition
-            var data = response.data;
-            deferred.resolve(data);
-          },
+                //success condition
+                var data = response.data;
+                deferred.resolve(data);
+              },
           function(response) {
-            //error condition
-            var data = response.data;
-            var status = response.status;
-            deferred.reject(data, status);
-          });
+                //error condition
+                var data = response.data;
+                var status = response.status;
+                deferred.reject(data, status);
+              });
         },
         function(response) {
           //Token error condition
