@@ -28,17 +28,6 @@ class AllLikesTest extends NetCommonsTestSuite {
  */
 	public static function suite() {
 		$plugin = preg_replace('/^All([\w]+)Test$/', '$1', __CLASS__);
-        $Folder = new Folder(CakePlugin::path($plugin) . 'Test' . DS . 'Case');
-        $files = $Folder->tree(null, true, 'files');
-        foreach ($files as $file) {
-            if (preg_match('/\/All([\w]+)Test\.php$/', $file)) {
-                continue;
-            }
-            if (substr($file, -8) === 'Test.php') {
-                var_dump($file);
-            }
-        }
-
 		$suite = new CakeTestSuite(sprintf('All %s Plugin tests', $plugin));
 		$suite->addTestDirectoryRecursive(CakePlugin::path($plugin) . 'Test' . DS . 'Case');
 		return $suite;
