@@ -85,9 +85,9 @@ class LikeExistsLikeTest extends NetCommonsModelTestCase {
  */
 	public function dataProviderExistsLike() {
 		return array(
-			array( 'aaa', 0),
-			array( 'testcontent', 1),
-			array( 'testcontent', 1, 1),
+			array('aaa', 0),
+			array('testcontent', 0),
+			array('testcontent', 1, 1),
 		);
 	}
 
