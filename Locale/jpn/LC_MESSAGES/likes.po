@@ -15,12 +15,13 @@ msgstr ""
 "X-Generator: Poedit 1.8.1\n"
 "Language: ja\n"
 
-#: Bbses/View/Elements/BbsBlocks/edit_form.ctp:79
-#: Blogs/View/Elements/Blocks/edit_form.ctp:110
+#: Likes/Test/Case/View/Helper/SettingTest.php:69
+#: Likes/View/Helper/LikeHelper.php:85
 msgid "Use like button"
 msgstr "ボタンを使用する"
 
-#: Bbses/View/Elements/BbsBlocks/edit_form.ctp:93
-#: Blogs/View/Elements/Blocks/edit_form.ctp:124
+#: Likes/Test/Case/View/Helper/SettingTest.php:71;73
+#: Likes/View/Helper/LikeHelper.php:94
 msgid "Use unlike button"
 msgstr "ボタンも使用する"
+
