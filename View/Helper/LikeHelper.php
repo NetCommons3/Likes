@@ -10,6 +10,8 @@
  */
 
 App::uses('AppHelper', 'View/Helper');
+App::uses('Like', 'Likes.Model');
+class_exists('Like');
 
 /**
  * Like Helper
@@ -256,6 +258,7 @@ class LikeHelper extends AppHelper {
 					$this->_View->element('Likes.like_button', ['isLiked' => Like::IS_LIKE]), $attributes);
 		}
 
+		return $output;
 		//わるいね
 		if (Hash::get($setting, 'use_unlike')) {
 			$output .= $this->Html->div(array('like-icon'),
