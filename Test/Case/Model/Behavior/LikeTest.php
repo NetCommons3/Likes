@@ -49,6 +49,8 @@ class LikeTest extends NetCommonsModelTestCase {
 		$this->TestLikes = ClassRegistry::init('TestLikes.TestLikes');
 		Current::$current['User']['id'] = '1';
 		$this->TestLikes2 = ClassRegistry::init('TestLikes.TestLikes2');
+		$this->TestLikes->recursive = -1;
+		$this->TestLikes = ClassRegistry::init('TestLikes.TestLikes');
 	}
 
 /**

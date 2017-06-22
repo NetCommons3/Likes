@@ -77,6 +77,11 @@ class LikeBehavior extends ModelBehavior {
  * @return void
  */
 	public function setup(Model $model, $config = array()) {
+		if ($model->recursive == -1) {
+			parent::setup($model, $config);
+			return;
+		}
+
 		if (isset($config['model'])) {
 			$this->__model = $config['model'];
 		} else {
