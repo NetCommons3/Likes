@@ -196,6 +196,10 @@ class LikesControllerTest extends NetCommonsControllerTestCase {
 		$this->_testPostAction('post', $data, array('action' => 'like'), null, 'json');
 
 		$this->generateNc(Inflector::camelize($this->_controller));
+
+		//ログイン
+		TestAuthGeneral::login($this);
+
 		$this->_mockForReturnTrue('Likes.Like', 'saveLike', 0);
 		$this->_testPostAction('post', $data, array('action' => 'like'), null, 'json');
 	}
