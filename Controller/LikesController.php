@@ -44,6 +44,19 @@ class LikesController extends LikesAppController {
  * @return void
  */
 	public function like() {
+		file_put_contents(APP . 'tmp/logs/watura.log', "LikesController.like\n", FILE_APPEND);
+
+		if ($this->request->is('get')) {
+			$this->response->header('Pragma', 'no-cache');
+			$like = $this->Like->getLikeByContentKey($this->request->query['contentKey']);
+			file_put_contents(APP . 'tmp/logs/watura.log', print_r($like, true), FILE_APPEND);
+			// TODO: should check disabled or not
+			$this->set('likeCount', $like['Like']['like_count']);
+			$this->set('unlikeCount', $like['Like']['unlike_count']);
+			$this->set('_serialize', array('likeCount', 'unlikeCount'));
+			return;
+		}
+
 		if (! $this->request->is('post')) {
 			return $this->throwBadRequest();
 		}
@@ -53,10 +66,7 @@ class LikesController extends LikesAppController {
 		}
 
 		$data = $this->data;
-		$like = $this->Like->find('first', array(
-			'recursive' => -1,
-			'conditions' => array('content_key' => $data['Like']['content_key'])
-		));
+		$like = $this->Like->getLikeByContentKey($data['Like']['content_key']);
 		$data = Hash::merge($like, $data);
 		if ($this->Like->saveLike($data)) {
 			return;

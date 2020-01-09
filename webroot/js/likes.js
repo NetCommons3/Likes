@@ -10,67 +10,88 @@
  * @param {string} Controller name
  * @param {function('$http', '$q')} Controller
  */
-NetCommonsApp.factory('LikesSave', ['$http', '$q', 'NC3_URL', function($http, $q, NC3_URL) {
-  return function(post) {
-
-    var deferred = $q.defer();
-    var promise = deferred.promise;
-
-    $http.get(NC3_URL + '/net_commons/net_commons/csrfToken.json')
-        .then(function(response) {
-          var token = response.data;
-          post._Token.key = token.data._Token.key;
-
-          //POSTリクエスト
-          $http.post(
-              NC3_URL + '/likes/likes/like.json',
-              $.param({_method: 'POST', data: post}),
-              {cache: false,
-                headers:
-                    {'Content-Type': 'application/x-www-form-urlencoded'}
-              }
-          ).then(
-          function(response) {
-                //success condition
-                var data = response.data;
-                deferred.resolve(data);
-              },
-          function(response) {
-                //error condition
-                var data = response.data;
-                var status = response.status;
-                deferred.reject(data, status);
-              });
-        },
-        function(response) {
-          //Token error condition
-          var data = response.data;
-          var status = response.status;
-          deferred.reject(data, status);
-        });
-
-    promise.success = function(fn) {
-      promise.then(fn);
-      return promise;
-    };
-
-    promise.error = function(fn) {
-      promise.then(null, fn);
-      return promise;
-    };
-
-    return promise;
+NetCommonsApp.factory('LikesLoad', ['$http', '$q', 'NC3_URL', function($http, $q, NC3_URL) {
+  return function(data) {
+    return request($http, $q, NC3_URL, data, true);
   };
 }]);
 
+NetCommonsApp.factory('LikesSave', ['$http', '$q', 'NC3_URL', function($http, $q, NC3_URL) {
+  return function(data) {
+    return request($http, $q, NC3_URL, data, false);
+  };
+}]);
+
+function request($http, $q, NC3_URL, params, isGetMethod) {
+  var deferred = $q.defer();
+  var promise = deferred.promise;
+
+  $http.get(NC3_URL + '/net_commons/net_commons/csrfToken.json')
+    .then(function(response) {
+        var token = response.data;
+        params._Token.key = token.data._Token.key;
+
+        var ret;
+        if (isGetMethod) {
+          // GETリクエスト
+          ret = $http.get(
+            NC3_URL + '/likes/likes/like.json',
+            {
+              cache: false,
+              params: { contentKey: params.Like.content_key }
+            }
+          );
+        } else {
+          // POSTリクエスト
+          ret = $http.post(
+            NC3_URL + '/likes/likes/like.json',
+            $.param({_method: 'POST', data: params}),
+            {
+              cache: false,
+              headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+            }
+          );
+        }
+        ret.then(
+          function(response) {
+            //success condition
+            var data = response.data;
+            deferred.resolve(data);
+          },
+          function(response) {
+            //error condition
+            var data = response.data;
+            var status = response.status;
+            deferred.reject(data, status);
+          });
+      },
+      function(response) {
+        //Token error condition
+        var data = response.data;
+        var status = response.status;
+        deferred.reject(data, status);
+      });
+
+  promise.success = function(fn) {
+    promise.then(fn);
+    return promise;
+  };
+
+  promise.error = function(fn) {
+    promise.then(null, fn);
+    return promise;
+  };
+
+  return promise;
+}
 
 /**
  * Likes Controller Javascript
  *
  * @param {string} Controller name
- * @param {function($scope, LikesSave)} Controller
+ * @param {function($scope, LikesLoad, LikesSave)} Controller
  */
-NetCommonsApp.controller('Likes', ['$scope', 'LikesSave', function($scope, LikesSave) {
+NetCommonsApp.controller('Likes', ['$scope', 'LikesLoad', 'LikesSave', function($scope, LikesLoad, LikesSave) {
 
   /**
    * Request parameters
@@ -100,7 +121,15 @@ NetCommonsApp.controller('Likes', ['$scope', 'LikesSave', function($scope, Likes
   $scope.initialize = function(data, options) {
     $scope.data = data;
     $scope.options = options;
-    $scope.options.disabled = false;
+    LikesLoad($scope.data)
+      .success(function(data) {
+        $scope.options['likeCount'] = data['likeCount'];
+        $scope.options['unlikeCount'] = data['unlikeCount'];
+      })
+      .error(function() {
+        //error condition
+        $scope.sending = false;
+      });
   };
 
   /**
@@ -117,7 +146,7 @@ NetCommonsApp.controller('Likes', ['$scope', 'LikesSave', function($scope, Likes
     $scope.sending = true;
 
     LikesSave($scope.data)
-        .success(function(data) {
+        .success(function() {
           $scope.sending = false;
           //success condition
           if (isLiked) {
@@ -126,7 +155,7 @@ NetCommonsApp.controller('Likes', ['$scope', 'LikesSave', function($scope, Likes
             $scope.options['unlikeCount'] = $scope.options['unlikeCount'] + 1;
           }
         })
-        .error(function(data, status) {
+        .error(function() {
           //error condition
           $scope.sending = false;
         });

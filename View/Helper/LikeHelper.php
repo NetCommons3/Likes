@@ -48,6 +48,8 @@ class LikeHelper extends AppHelper {
  * @return void
  */
 	public function beforeRender($viewFile) {
+		file_put_contents(APP . 'tmp/logs/watura.log', "LikeHelper.beforeRender\n", FILE_APPEND);
+
 		$this->NetCommonsHtml->css('/likes/css/style.css');
 		$this->NetCommonsHtml->script('/likes/js/likes.js');
 		parent::beforeRender($viewFile);
@@ -72,6 +74,8 @@ class LikeHelper extends AppHelper {
  * @return string HTML tags
  */
 	public function setting($likeFieldName, $unlikeFieldName, $attributes = array()) {
+		file_put_contents(APP . 'tmp/logs/watura.log', "LikeHelper.setting\n", FILE_APPEND);
+
 		$output = '';
 
 		//属性の設定
@@ -147,12 +151,13 @@ class LikeHelper extends AppHelper {
  * @return string HTML tags
  */
 	public function display($setting, $content, $attributes = array()) {
+		file_put_contents(APP . 'tmp/logs/watura.log', "LikeHelper.display\n", FILE_APPEND);
+
 		$output = '';
 
 		//いいね
 		if (isset($setting['use_like']) && $setting['use_like']) {
-			$element = '<span class="glyphicon glyphicon-thumbs-up"></span> ';
-			$element .= (int)Hash::get($content, 'Like.like_count');
+			$element = '<span class="glyphicon glyphicon-thumbs-up"></span> -';
 			$output .= $this->Html->div(
 						array('like-icon', 'text-muted'), $element, $attributes
 					);
@@ -160,8 +165,7 @@ class LikeHelper extends AppHelper {
 
 		//わるいね
 		if (isset($setting['use_unlike']) && $setting['use_unlike']) {
-			$element = '<span class="glyphicon glyphicon-thumbs-down"></span> ';
-			$element .= (int)Hash::get($content, 'Like.unlike_count');
+			$element = '<span class="glyphicon glyphicon-thumbs-down"></span> -';
 			$output .= $this->Html->div(
 						array('like-icon', 'text-muted'), $element, $attributes
 					);
@@ -191,15 +195,16 @@ class LikeHelper extends AppHelper {
  * @return string HTML tags
  */
 	public function buttons($model, $setting, $content, $attributes = array()) {
+		file_put_contents(APP . 'tmp/logs/watura.log', "LikeHelper.buttons\n", FILE_APPEND);
+		file_put_contents(APP . 'tmp/logs/watura.log', print_r(Array($model, $setting, $content), true), FILE_APPEND);
+
 		$output = '';
+
+		// isset($content['LikesUser']['id']) ||
+		//				$content[$model]['status'] !== WorkflowComponent::STATUS_PUBLISHED
 
 		if (! Hash::get($setting, 'use_like') && ! Hash::get($setting, 'use_like')) {
 			return $output;
-		}
-
-		if (isset($content['LikesUser']['id']) ||
-				$content[$model]['status'] !== WorkflowComponent::STATUS_PUBLISHED) {
-			return $this->display($setting, $content, $attributes);
 		}
 
 		if (! isset($content['Like']['id'])) {
@@ -231,9 +236,9 @@ class LikeHelper extends AppHelper {
 			),
 		);
 		$options = array(
-			'likeCount' => (int)Hash::get($content, 'Like.like_count'),
-			'unlikeCount' => (int)Hash::get($content, 'Like.unlike_count'),
-			'disabled' => false
+			'likeCount' => '-',
+			'unlikeCount' => '-',
+			'disabled' => true
 		);
 
 		$tokenFields = Hash::flatten($data);

@@ -181,9 +181,7 @@ class Like extends LikesAppModel {
 	public function getLikeByContentKey($contentKey) {
 		return $this->find('first', array(
 			'recursive' => -1,
-			'conditions' => array(
-				$this->alias . '.content_key' => $contentKey,
-			)
+			'conditions' => array('content_key' => $contentKey)
 		));
 	}
 
