@@ -44,12 +44,9 @@ class LikesController extends LikesAppController {
  * @return void
  */
 	public function like() {
-		file_put_contents(APP . 'tmp/logs/watura.log', "LikesController.like\n", FILE_APPEND);
-
 		if ($this->request->is('get')) {
 			$this->response->header('Pragma', 'no-cache');
 			$like = $this->Like->getLikeByContentKey($this->request->query['contentKey']);
-			file_put_contents(APP . 'tmp/logs/watura.log', print_r($like, true), FILE_APPEND);
 
             $contentKey = $this->request->query['contentKey'];
             $like = $this->Like->find('first', array(

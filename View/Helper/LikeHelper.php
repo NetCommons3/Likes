@@ -48,8 +48,6 @@ class LikeHelper extends AppHelper {
  * @return void
  */
 	public function beforeRender($viewFile) {
-		file_put_contents(APP . 'tmp/logs/watura.log', "LikeHelper.beforeRender\n", FILE_APPEND);
-
 		$this->NetCommonsHtml->css('/likes/css/style.css');
 		$this->NetCommonsHtml->script('/likes/js/likes.js');
 		parent::beforeRender($viewFile);
@@ -74,8 +72,6 @@ class LikeHelper extends AppHelper {
  * @return string HTML tags
  */
 	public function setting($likeFieldName, $unlikeFieldName, $attributes = array()) {
-		file_put_contents(APP . 'tmp/logs/watura.log', "LikeHelper.setting\n", FILE_APPEND);
-
 		$output = '';
 
 		//属性の設定
@@ -151,8 +147,6 @@ class LikeHelper extends AppHelper {
  * @return string HTML tags
  */
 	public function display($setting, $content, $attributes = array()) {
-		file_put_contents(APP . 'tmp/logs/watura.log', "LikeHelper.display\n", FILE_APPEND);
-
 		$output = '';
 
 		//いいね
@@ -195,9 +189,6 @@ class LikeHelper extends AppHelper {
  * @return string HTML tags
  */
 	public function buttons($model, $setting, $content, $attributes = array()) {
-		file_put_contents(APP . 'tmp/logs/watura.log', "LikeHelper.buttons\n", FILE_APPEND);
-		file_put_contents(APP . 'tmp/logs/watura.log', print_r(Array($model, $setting, $content), true), FILE_APPEND);
-
 		$output = '';
 
 		// isset($content['LikesUser']['id']) ||
