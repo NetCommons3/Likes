@@ -173,13 +173,13 @@ class Like extends LikesAppModel {
 	}
 
 /**
- * Count likes
+ * Get like data by a specified content key
  *
  * @param string $contentKey Content key of each plugin.
  * @return int
  */
-	public function countLikes($contentKey) {
-		return $this->find('count', array(
+	public function getLikeByContentKey($contentKey) {
+		return $this->find('first', array(
 			'recursive' => -1,
 			'conditions' => array(
 				$this->alias . '.content_key' => $contentKey,

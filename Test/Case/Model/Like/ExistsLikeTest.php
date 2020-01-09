@@ -1,6 +1,6 @@
 <?php
 /**
- * Like::ExistsLike()のテスト
+ * Like::existsLike()のテスト
  *
  * @property Like $Like
  *
@@ -15,7 +15,7 @@
 App::uses('NetCommonsModelTestCase', 'NetCommons.TestSuite');
 
 /**
- * Like::ExistLike()のテスト
+ * Like::existsLike()のテスト
  *
  * @author Shohei Nakajima <nakajimashouhei@gmail.com>
  * @author Kazunori Sakamoto <exkazuu@gmail.com>

@@ -1,6 +1,6 @@
 <?php
 /**
- * Like::CountLikes()のテスト
+ * Like::getLikeByContentKey()のテスト
  *
  * @property Like $Like
  *
@@ -15,13 +15,13 @@
 App::uses('NetCommonsModelTestCase', 'NetCommons.TestSuite');
 
 /**
- * Like::CountLikes()のテスト
+ * Like::getLikeByContentKey()のテスト
  *
  * @author Shohei Nakajima <nakajimashouhei@gmail.com>
  * @author Kazunori Sakamoto <exkazuu@gmail.com>
  * @package NetCommons\Likes\Test\Case\Model\Like
  */
-class LikeCountLikesTest extends NetCommonsModelTestCase {
+class LikeGetLikeByContentKeyTest extends NetCommonsModelTestCase {
 
 /**
  * Plugin name
@@ -52,28 +52,28 @@ class LikeCountLikesTest extends NetCommonsModelTestCase {
  *
  * @var array
  */
-	protected $_methodName = 'countLikes';
+	protected $_methodName = 'getLikeByContentKey';
 
 /**
- * existsLikeのテスト
+ * getLikeByContentKeyのテスト
  *
  * @param array $contentKey キー情報
- * @param int $expected 期待値
+ * @param string $expected 期待値
  * @dataProvider dataProviderCountLikes
  * @return void
  */
-	public function testCountLikes($contentKey, $expected) {
+	public function testGetLikeByContentKey($contentKey) {
 		$model = $this->_modelName;
 		$method = $this->_methodName;
 
 		//テスト実行
 		$result = $this->$model->$method($contentKey);
 
-		$this->assertEquals($result, $expected);
+		$this->assertEquals($result['Like']['content_key'], $expected);
 	}
 
 /**
- * countLikesのDataProvider
+ * getLikeByContentKeyのDataProvider
  *
  * #### 戻り値
  *  - contentKey 取得データ
@@ -83,8 +83,8 @@ class LikeCountLikesTest extends NetCommonsModelTestCase {
  */
 	public function dataProviderCountLikes() {
 		return array(
-			array('aaa', 0),
-			array('testcontent', 1),
+			array('aaa', null),
+			array('testcontent', 'testcontent'),
 		);
 	}
 
