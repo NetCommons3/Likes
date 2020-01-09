@@ -16,6 +16,7 @@ App::uses('LikesAppController', 'Likes.Controller');
  * Likes Controller
  *
  * @author Shohei Nakajima <nakajimashouhei@gmail.com>
+ * @author Kazunori Sakamoto <exkazuu@gmail.com>
  * @package NetCommons\Likes\Controller
  */
 class LikesController extends LikesAppController {
@@ -45,10 +46,16 @@ class LikesController extends LikesAppController {
  * @return void
  */
 	public function like() {
-		if ($this->request->is('get')) {
-			$this->response->header('Pragma', 'no-cache');
+		if (! $this->request->is('post')) {
+			return $this->throwBadRequest();
+		}
 
-			$contentKey = $this->request->query['contentKey'];
+		if ($this->Like->existsLike($this->data['Like']['content_key'])) {
+			return;
+		}
+
+		if ($this->data['action'] == 'load') {
+			$contentKey = $this->data['contentKey'];
 			$like = $this->Like->find('first', array(
 				'recursive' => -1,
 				'fields' => array('id', 'like_count', 'unlike_count'),
@@ -72,14 +79,6 @@ class LikesController extends LikesAppController {
 			$this->set('likeCount', $like['Like']['like_count']);
 			$this->set('unlikeCount', $like['Like']['unlike_count']);
 			$this->set('_serialize', array('disabled', 'likeCount', 'unlikeCount'));
-			return;
-		}
-
-		if (! $this->request->is('post')) {
-			return $this->throwBadRequest();
-		}
-
-		if ($this->Like->existsLike($this->data['Like']['content_key'])) {
 			return;
 		}
 

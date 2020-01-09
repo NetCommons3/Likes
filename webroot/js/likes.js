@@ -32,28 +32,16 @@ function request($http, $q, NC3_URL, params, isGetMethod) {
         var token = response.data;
         params._Token.key = token.data._Token.key;
 
-        var ret;
-        if (isGetMethod) {
-          // GETリクエスト
-          ret = $http.get(
-            NC3_URL + '/likes/likes/like.json',
-            {
-              cache: false,
-              params: { contentKey: params.Like.content_key }
-            }
-          );
-        } else {
-          // POSTリクエスト
-          ret = $http.post(
-            NC3_URL + '/likes/likes/like.json',
-            $.param({_method: 'POST', data: params}),
-            {
-              cache: false,
-              headers: {'Content-Type': 'application/x-www-form-urlencoded'}
-            }
-          );
-        }
-        ret.then(
+        // POSTリクエスト
+        var data = isGetMethod ? { action: 'load', contentKey: params.Like.content_key } : params;
+        $http.post(
+          NC3_URL + '/likes/likes/like.json',
+          $.param({ _method: 'POST', data: data }),
+          {
+            cache: false,
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+          }
+        ).then(
           function(response) {
             //success condition
             var data = response.data;
