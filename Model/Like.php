@@ -173,19 +173,6 @@ class Like extends LikesAppModel {
 	}
 
 /**
- * Get like data by a specified content key
- *
- * @param string $contentKey Content key of each plugin.
- * @return int
- */
-	public function getLikeByContentKey($contentKey) {
-		return $this->find('first', array(
-			'recursive' => -1,
-			'conditions' => array('content_key' => $contentKey)
-		));
-	}
-
-/**
  * Exists like data
  *
  * @param string $contentKey Content key of each plugin.
