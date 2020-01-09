@@ -46,7 +46,6 @@ class LikesController extends LikesAppController {
 	public function like() {
 		if ($this->request->is('get')) {
 			$this->response->header('Pragma', 'no-cache');
-			$like = $this->Like->getLikeByContentKey($this->request->query['contentKey']);
 
 			$contentKey = $this->request->query['contentKey'];
 			$like = $this->Like->find('first', array(
@@ -59,22 +58,16 @@ class LikesController extends LikesAppController {
 				'like_id' => $like->id,
 			);
 			if (Current::read('User.id')) {
-				$likesUserConditions['LikesUser.user_id'] = Current::read('User.id');
+				$likesUserConditions['user_id'] = Current::read('User.id');
 			} else {
-				$likesUserConditions['LikesUser.session_key'] = Session::id();
+				$likesUserConditions['session_key'] = Session::id();
 			}
 			$likesUserCount = $this->LikesUser->find('count', array(
 				'recursive' => -1,
 				'conditions' => $likesUserConditions
 			));
 
-			$blogEntry = $this->BlogEntry->find('first', array(
-				'recursive' => -1,
-				'fields' => array('status'),
-				'conditions' => array('key' => $contentKey)
-			));
-
-			$this->set('disabled', $likesUserCount || $blogEntry['status'] !== WorkflowComponent::STATUS_PUBLISHED);
+			$this->set('disabled', $likesUserCount);
 			$this->set('likeCount', $like['Like']['like_count']);
 			$this->set('unlikeCount', $like['Like']['unlike_count']);
 			$this->set('_serialize', array('disabled', 'likeCount', 'unlikeCount'));

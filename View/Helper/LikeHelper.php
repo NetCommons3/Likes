@@ -191,11 +191,12 @@ class LikeHelper extends AppHelper {
 	public function buttons($model, $setting, $content, $attributes = array()) {
 		$output = '';
 
-		// isset($content['LikesUser']['id']) ||
-		//				$content[$model]['status'] !== WorkflowComponent::STATUS_PUBLISHED
-
 		if (! Hash::get($setting, 'use_like') && ! Hash::get($setting, 'use_like')) {
 			return $output;
+		}
+
+		if ($content[$model]['status'] !== WorkflowComponent::STATUS_PUBLISHED) {
+			return $this->display($setting, $content, $attributes);
 		}
 
 		if (! isset($content['Like']['id'])) {

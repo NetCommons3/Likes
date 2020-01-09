@@ -123,12 +123,9 @@ NetCommonsApp.controller('Likes', ['$scope', 'LikesLoad', 'LikesSave', function(
     $scope.options = options;
     LikesLoad($scope.data)
       .success(function(data) {
+        $scope.options['disabled'] = data['disabled'];
         $scope.options['likeCount'] = data['likeCount'];
         $scope.options['unlikeCount'] = data['unlikeCount'];
-      })
-      .error(function() {
-        //error condition
-        $scope.sending = false;
       });
   };
 
