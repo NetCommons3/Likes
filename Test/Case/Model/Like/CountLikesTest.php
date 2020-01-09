@@ -1,11 +1,12 @@
 <?php
 /**
- * Like::ExistsLike()のテスト
+ * Like::CountLikes()のテスト
  *
  * @property Like $Like
  *
  * @author Noriko Arai <arai@nii.ac.jp>
  * @author Shohei Nakajima <nakajimashouhei@gmail.com>
+ * @author Kazunori Sakamoto <exkazuu@gmail.com>
  * @link http://www.netcommons.org NetCommons Project
  * @license http://www.netcommons.org/license.txt NetCommons License
  * @copyright Copyright 2014, NetCommons Project
@@ -14,12 +15,13 @@
 App::uses('NetCommonsModelTestCase', 'NetCommons.TestSuite');
 
 /**
- * Like::ExistLike()のテスト
+ * Like::CountLikes()のテスト
  *
  * @author Shohei Nakajima <nakajimashouhei@gmail.com>
+ * @author Kazunori Sakamoto <exkazuu@gmail.com>
  * @package NetCommons\Likes\Test\Case\Model\Like
  */
-class LikeExistsLikeTest extends NetCommonsModelTestCase {
+class LikeCountLikesTest extends NetCommonsModelTestCase {
 
 /**
  * Plugin name
@@ -50,22 +52,19 @@ class LikeExistsLikeTest extends NetCommonsModelTestCase {
  *
  * @var array
  */
-	protected $_methodName = 'existsLike';
+	protected $_methodName = 'countLikes';
 
 /**
  * existsLikeのテスト
  *
  * @param array $contentKey キー情報
  * @param int $expected 期待値
- * @param int $userId ユーザーID
- * @dataProvider dataProviderExistsLike
+ * @dataProvider dataProviderCountLikes
  * @return void
  */
-	public function testExistsLike($contentKey, $expected, $userId = 0) {
+	public function testCountLikes($contentKey, $expected) {
 		$model = $this->_modelName;
 		$method = $this->_methodName;
-
-		Current::$current['User']['id'] = $userId;
 
 		//テスト実行
 		$result = $this->$model->$method($contentKey);
@@ -74,20 +73,18 @@ class LikeExistsLikeTest extends NetCommonsModelTestCase {
 	}
 
 /**
- * existsLikeのDataProvider
+ * countLikesのDataProvider
  *
  * #### 戻り値
  *  - contentKey 取得データ
  *  - expected 期待値
- *  - userId ユーザーID
  *
  * @return array
  */
-	public function dataProviderExistsLike() {
+	public function dataProviderCountLikes() {
 		return array(
 			array('aaa', 0),
-			array('testcontent', 0),
-			array('testcontent', 1, 1),
+			array('testcontent', 1),
 		);
 	}
 
