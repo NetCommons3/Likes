@@ -152,7 +152,8 @@ class LikeHelper extends AppHelper {
 
 		//いいね
 		if (isset($setting['use_like']) && $setting['use_like']) {
-			$element = '<span class="glyphicon glyphicon-thumbs-up"></span> -';
+			$element = '<span class="glyphicon glyphicon-thumbs-up"></span> ';
+			$element .= (int)Hash::get($content, 'Like.like_count');
 			$output .= $this->Html->div(
 						array('like-icon', 'text-muted'), $element, $attributes
 					);
@@ -160,7 +161,8 @@ class LikeHelper extends AppHelper {
 
 		//わるいね
 		if (isset($setting['use_unlike']) && $setting['use_unlike']) {
-			$element = '<span class="glyphicon glyphicon-thumbs-down"></span> -';
+			$element = '<span class="glyphicon glyphicon-thumbs-down"></span> ';
+			$element .= (int)Hash::get($content, 'Like.unlike_count');
 			$output .= $this->Html->div(
 						array('like-icon', 'text-muted'), $element, $attributes
 					);
