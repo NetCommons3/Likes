@@ -50,10 +50,6 @@ class LikesController extends LikesAppController {
 			return $this->throwBadRequest();
 		}
 
-		if ($this->Like->existsLike($this->data['Like']['content_key'])) {
-			return;
-		}
-
 		if ($this->data['action'] == 'load') {
 			$contentKey = $this->data['contentKey'];
 			$like = $this->Like->find('first', array(
@@ -79,6 +75,10 @@ class LikesController extends LikesAppController {
 			$this->set('likeCount', $like['Like']['like_count']);
 			$this->set('unlikeCount', $like['Like']['unlike_count']);
 			$this->set('_serialize', array('disabled', 'likeCount', 'unlikeCount'));
+			return;
+		}
+
+		if ($this->Like->existsLike($this->data['Like']['content_key'])) {
 			return;
 		}
 
