@@ -6,6 +6,7 @@
  *
  * @author Noriko Arai <arai@nii.ac.jp>
  * @author Shohei Nakajima <nakajimashouhei@gmail.com>
+ * @author Kazunori Sakamoto <exkazuu@gmail.com>
  * @link http://www.netcommons.org NetCommons Project
  * @license http://www.netcommons.org/license.txt NetCommons License
  * @copyright Copyright 2014, NetCommons Project
@@ -17,6 +18,7 @@ App::uses('NetCommonsModelTestCase', 'NetCommons.TestSuite');
  * Like::ExistLike()のテスト
  *
  * @author Shohei Nakajima <nakajimashouhei@gmail.com>
+ * @author Kazunori Sakamoto <exkazuu@gmail.com>
  * @package NetCommons\Likes\Test\Case\Model\Like
  */
 class LikeExistsLikeTest extends NetCommonsModelTestCase {
@@ -56,7 +58,7 @@ class LikeExistsLikeTest extends NetCommonsModelTestCase {
  * existsLikeのテスト
  *
  * @param array $contentKey キー情報
- * @param int $expected 期待値
+ * @param bool $expected 期待値
  * @param int $userId ユーザーID
  * @dataProvider dataProviderExistsLike
  * @return void
@@ -85,9 +87,9 @@ class LikeExistsLikeTest extends NetCommonsModelTestCase {
  */
 	public function dataProviderExistsLike() {
 		return array(
-			array('aaa', 0),
-			array('testcontent', 0),
-			array('testcontent', 1, 1),
+			array('aaa', false),
+			array('testcontent', false),
+			array('testcontent', true, 1),
 		);
 	}
 
