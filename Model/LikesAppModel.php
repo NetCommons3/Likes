@@ -18,5 +18,5 @@ App::uses('AppModel', 'Model');
  * @package NetCommons\Likes\Model
  */
 class LikesAppModel extends AppModel {
-
+    public $invalidateCDN = false;
 }

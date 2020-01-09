@@ -50,10 +50,37 @@ class LikesController extends LikesAppController {
 			$this->response->header('Pragma', 'no-cache');
 			$like = $this->Like->getLikeByContentKey($this->request->query['contentKey']);
 			file_put_contents(APP . 'tmp/logs/watura.log', print_r($like, true), FILE_APPEND);
-			// TODO: should check disabled or not
+
+            $contentKey = $this->request->query['contentKey'];
+            $like = $this->Like->find('first', array(
+                'recursive' => -1,
+                'fields' => array('id', 'like_count', 'unlike_count'),
+                'conditions' => array('content_key' => $contentKey)
+            ));
+
+            $likesUserConditions = array(
+                'like_id' => $like->id,
+            );
+            if (Current::read('User.id')) {
+                $likesUserConditions['LikesUser.user_id'] = Current::read('User.id');
+            } else {
+                $likesUserConditions['LikesUser.session_key'] = Session::id();
+            }
+            $likesUserCount = $this->LikesUser->find('count', array(
+                'recursive' => -1,
+                'conditions' => $likesUserConditions
+            ));
+
+            $blogEntry = $this->BlogEntry->find('first', array(
+                'recursive' => -1,
+                'fields' => array('status'),
+                'conditions' => array('key' => $contentKey)
+            ));
+
+			$this->set('disabled', $likesUserCount || $blogEntry['status'] !== WorkflowComponent::STATUS_PUBLISHED);
 			$this->set('likeCount', $like['Like']['like_count']);
 			$this->set('unlikeCount', $like['Like']['unlike_count']);
-			$this->set('_serialize', array('likeCount', 'unlikeCount'));
+			$this->set('_serialize', array('disabled', 'likeCount', 'unlikeCount'));
 			return;
 		}
 
@@ -66,7 +93,10 @@ class LikesController extends LikesAppController {
 		}
 
 		$data = $this->data;
-		$like = $this->Like->getLikeByContentKey($data['Like']['content_key']);
+        $like = $this->find('first', array(
+            'recursive' => -1,
+            'conditions' => array('content_key' => $data['Like']['content_key'])
+        ));
 		$data = Hash::merge($like, $data);
 		if ($this->Like->saveLike($data)) {
 			return;
