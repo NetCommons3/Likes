@@ -124,9 +124,9 @@ NetCommonsApp.controller('Likes', ['$scope', 'LikesLoad', 'LikesSave', function(
     $scope.options = options;
     LikesLoad($scope.data)
       .success(function(data) {
-        $scope.options['disabled'] = data['disabled'];
-        $scope.options['likeCount'] = data['likeCount'];
-        $scope.options['unlikeCount'] = data['unlikeCount'];
+        $scope.options.disabled = data.disabled;
+        $scope.options.likeCount = data.likeCount;
+        $scope.options.unlikeCount = data.unlikeCount;
       });
   };
 
@@ -136,7 +136,6 @@ NetCommonsApp.controller('Likes', ['$scope', 'LikesLoad', 'LikesSave', function(
    * @return {void}
    */
   $scope.save = function(isLiked) {
-    $scope.data['LikesUser']['is_liked'] = isLiked;
     if ($scope.options.disabled) {
       return;
     }
@@ -148,9 +147,9 @@ NetCommonsApp.controller('Likes', ['$scope', 'LikesLoad', 'LikesSave', function(
           $scope.sending = false;
           //success condition
           if (isLiked) {
-            $scope.options['likeCount'] = $scope.options['likeCount'] + 1;
+            $scope.options.likeCount += 1;
           } else {
-            $scope.options['unlikeCount'] = $scope.options['unlikeCount'] + 1;
+            $scope.options.unlikeCount += 1;
           }
         })
         .error(function() {
