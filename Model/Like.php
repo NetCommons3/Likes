@@ -172,20 +172,20 @@ class Like extends LikesAppModel {
 		parent::afterSave($created, $options);
 	}
 
-    /**
-     * Count likes
-     *
-     * @param string $contentKey Content key of each plugin.
-     * @return int
-     */
-    public function countLikes($contentKey) {
-        return $this->find('count', array(
-            'recursive' => -1,
-            'conditions' => array(
-                $this->alias . '.content_key' => $contentKey,
-            )
-        ));
-    }
+	/**
+	 * Count likes
+	 *
+	 * @param string $contentKey Content key of each plugin.
+	 * @return int
+	 */
+	public function countLikes($contentKey) {
+		return $this->find('count', array(
+			'recursive' => -1,
+			'conditions' => array(
+				$this->alias . '.content_key' => $contentKey,
+			)
+		));
+	}
 
 /**
  * Exists like data
