@@ -1,6 +1,7 @@
 /**
  * @fileoverview Likes Javascript
  * @author nakajimashouhei@gmail.com (Shohei Nakajima)
+ * @author exkazuu@gmail.com (Kazunori Sakamoto)
  */
 
 
