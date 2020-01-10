@@ -98,11 +98,9 @@ class LikesController extends LikesAppController {
 			'conditions' => array('content_key' => $data['Like']['content_key'])
 		));
 		$data = Hash::merge($like, $data);
-
 		if ($this->Like->saveLike($data)) {
 			return;
 		}
-
 		$this->NetCommons->handleValidationError($this->Like->validationErrors);
 	}
 }
