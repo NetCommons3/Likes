@@ -29,11 +29,14 @@ function request($http, $q, NC3_URL, params, isGetMethod) {
 
   $http.get(NC3_URL + '/net_commons/net_commons/csrfToken.json')
     .then(function(response) {
+        console.log(params);
+
+        var data = isGetMethod ? { action: 'load', contentKey: params.Like.content_key, _Token: {} } : params;
+
         var token = response.data;
-        params._Token.key = token.data._Token.key;
+        data._Token.key = token.data._Token.key;
 
         // POSTリクエスト
-        var data = isGetMethod ? { action: 'load', contentKey: params.Like.content_key } : params;
         $http.post(
           NC3_URL + '/likes/likes/like.json',
           $.param({ _method: 'POST', data: data }),
