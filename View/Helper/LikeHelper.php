@@ -23,6 +23,7 @@ class_exists('Like');
  * * イイネ！、ヤダネ！ボタン表示:[buttonsメソッド](#buttons)
  *
  * @author Shohei Nakajima <nakajimashouhei@gmail.com>
+ * @author Kazunori Sakamoto <exkazuu@gmail.com>
  * @package NetCommons\Likes\View\Helper
  */
 class LikeHelper extends AppHelper {
@@ -217,6 +218,8 @@ class LikeHelper extends AppHelper {
 			);
 		}
 
+		$currentData = $this->_View->request->data;
+
 		$data = array(
 			'Frame' => array('id' => Current::read('Frame.id')),
 			'Like' => array(
@@ -224,16 +227,20 @@ class LikeHelper extends AppHelper {
 				'block_key' => Hash::get($content, 'Like.block_key'),
 				'content_key' => Hash::get($content, 'Like.content_key'),
 			),
+		);
+
+		$tokenFields = Hash::flatten($data);
+		$hiddenFields = array_keys($tokenFields);
+
+		$this->_View->request->data = $data;
+		$loadToken = $this->Token->getToken('LikeLoad', '/likes/likes/load.json', $tokenFields, $hiddenFields);
+
+		$data += array(
 			'LikesUser' => array(
 				'like_id' => Hash::get($content, 'LikesUser.like_id'),
 				'user_id' => Hash::get($content, 'LikesUser.user_id'),
 				'is_liked' => Hash::get($content, 'LikesUser.is_liked'),
 			),
-		);
-		$options = array(
-			'likeCount' => '-',
-			'unlikeCount' => '-',
-			'disabled' => true
 		);
 
 		$tokenFields = Hash::flatten($data);
@@ -241,13 +248,21 @@ class LikeHelper extends AppHelper {
 		unset($hiddenFields['LikesUser.is_liked']);
 		$hiddenFields = array_keys($hiddenFields);
 
-		$cunnentData = $this->_View->request->data;
 		$this->_View->request->data = $data;
+		$saveToken = $this->Token->getToken('LikeSave', '/likes/likes/save.json', $tokenFields, $hiddenFields);
 
-		$tokens = $this->Token->getToken('Like', '/likes/likes/like.json', $tokenFields, $hiddenFields);
-		$data += $tokens;
+		$this->_View->request->data = $currentData;
 
-		$this->_View->request->data = $cunnentData;
+		$data += array(
+			'load' => $loadToken,
+			'save' => $saveToken
+		);
+
+		$options = array(
+			'likeCount' => '-',
+			'unlikeCount' => '-',
+			'disabled' => true
+		);
 
 		$output .= '<div class="like-icon" ng-controller="Likes" ' .
 						'ng-init="initialize(' . h(json_encode($data)) . ', ' . h(json_encode($options)) . ')">';

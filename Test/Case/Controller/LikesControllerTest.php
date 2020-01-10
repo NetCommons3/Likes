@@ -4,6 +4,7 @@
  *
  * @author Noriko Arai <arai@nii.ac.jp>
  * @author Shohei Nakajima <nakajimashouhei@gmail.com>
+ * @author Kazunori Sakamoto <exkazuu@gmail.com>
  * @link http://www.netcommons.org NetCommons Project
  * @license http://www.netcommons.org/license.txt NetCommons License
  * @copyright Copyright 2014, NetCommons Project
@@ -15,6 +16,7 @@ App::uses('NetCommonsControllerTestCase', 'NetCommons.TestSuite');
  * LikesController Test Case
  *
  * @author Shohei Nakajima <nakajimashouhei@gmail.com>
+ * @author Kazunori Sakamoto <exkazuu@gmail.com>
  * @package NetCommons\Likes\Test\Case\Controller
  * @SuppressWarnings(PHPMD.LongVariable)
  */
@@ -109,7 +111,7 @@ class LikesControllerTest extends NetCommonsControllerTestCase {
 		$url = Hash::merge(array(
 			'plugin' => $this->plugin,
 			'controller' => $this->_controller,
-			'action' => 'like',
+			'action' => 'save',
 		), $urlOptions);
 
 		$this->_testGetAction($url, $assert, $exception, $return);
@@ -151,7 +153,7 @@ class LikesControllerTest extends NetCommonsControllerTestCase {
  * @return void
  */
 	public function testLikePost($data, $urlOptions, $exception = null, $return = 'json') {
-		$this->_testPostAction('post', $data, Hash::merge(array('action' => 'like'), $urlOptions), $exception, $return);
+		$this->_testPostAction('post', $data, Hash::merge(array('action' => 'save'), $urlOptions), $exception, $return);
 	}
 
 /**
@@ -193,7 +195,7 @@ class LikesControllerTest extends NetCommonsControllerTestCase {
 	public function testLikeExists() {
 		$data = $this->dataProviderLikePost()[2]['data'];
 
-		$this->_testPostAction('post', $data, array('action' => 'like'), null, 'json');
+		$this->_testPostAction('post', $data, array('action' => 'save'), null, 'json');
 
 		$this->generateNc(Inflector::camelize($this->_controller));
 
@@ -201,7 +203,7 @@ class LikesControllerTest extends NetCommonsControllerTestCase {
 		TestAuthGeneral::login($this);
 
 		$this->_mockForReturnTrue('Likes.Like', 'saveLike', 0);
-		$this->_testPostAction('post', $data, array('action' => 'like'), null, 'json');
+		$this->_testPostAction('post', $data, array('action' => 'save'), null, 'json');
 	}
 
 }

@@ -23,23 +23,32 @@ NetCommonsApp.factory('LikesSave', ['$http', '$q', 'NC3_URL', function($http, $q
   };
 }]);
 
-function request($http, $q, NC3_URL, params, isGetMethod) {
+function request($http, $q, NC3_URL, params, isLoad) {
   var deferred = $q.defer();
   var promise = deferred.promise;
 
   $http.get(NC3_URL + '/net_commons/net_commons/csrfToken.json')
     .then(function(response) {
-        console.log(params);
-
-        var data = isGetMethod ? { action: 'load', contentKey: params.Like.content_key, _Token: {} } : params;
+        var url = NC3_URL;
+        params = Object.assign({}, params);
+        if (isLoad) {
+          params._Token = params.load._Token;
+          url += '/likes/likes/load.json';
+          delete params.LikesUser;
+        } else {
+          params._Token = params.save._Token;
+          url += '/likes/likes/save.json';
+        }
+        delete params.load;
+        delete params.save;
 
         var token = response.data;
-        data._Token.key = token.data._Token.key;
+        params._Token.key = token.data._Token.key;
 
         // POSTリクエスト
         $http.post(
-          NC3_URL + '/likes/likes/like.json',
-          $.param({ _method: 'POST', data: data }),
+          url,
+          $.param({ _method: 'POST', data: params }),
           {
             cache: false,
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
@@ -113,6 +122,8 @@ NetCommonsApp.controller('Likes', ['$scope', 'LikesLoad', 'LikesSave', function(
   $scope.initialize = function(data, options) {
     $scope.data = data;
     $scope.options = options;
+    $scope.options.disabled = true;
+
     LikesLoad($scope.data)
       .success(function(data) {
         $scope.options.disabled = data.disabled;
@@ -127,6 +138,7 @@ NetCommonsApp.controller('Likes', ['$scope', 'LikesLoad', 'LikesSave', function(
    * @return {void}
    */
   $scope.save = function(isLiked) {
+    $scope.data.LikesUser.is_liked = isLiked;
     if ($scope.options.disabled) {
       return;
     }
@@ -134,19 +146,19 @@ NetCommonsApp.controller('Likes', ['$scope', 'LikesLoad', 'LikesSave', function(
     $scope.sending = true;
 
     LikesSave($scope.data)
-        .success(function() {
-          $scope.sending = false;
-          //success condition
-          if (isLiked) {
-            $scope.options.likeCount += 1;
-          } else {
-            $scope.options.unlikeCount += 1;
-          }
-        })
-        .error(function() {
-          //error condition
-          $scope.sending = false;
-        });
+      .success(function(data) {
+        $scope.sending = false;
+        //success condition
+        if (isLiked) {
+          $scope.options.likeCount += 1;
+        } else {
+          $scope.options.unlikeCount += 1;
+        }
+      })
+      .error(function() {
+        //error condition
+        $scope.sending = false;
+      });
   };
 }]);
 
