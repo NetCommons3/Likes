@@ -146,7 +146,7 @@ NetCommonsApp.controller('Likes', ['$scope', 'LikesLoad', 'LikesSave', function(
     $scope.sending = true;
 
     LikesSave($scope.data)
-      .success(function(data) {
+      .success(function() {
         $scope.sending = false;
         //success condition
         if (isLiked) {
