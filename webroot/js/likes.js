@@ -5,86 +5,88 @@
  */
 
 
-/**
- * Likes Service Javascript
- *
- * @param {string} Controller name
- * @param {function('$http', '$q')} Controller
- */
-NetCommonsApp.factory('LikesLoad', ['$http', '$q', 'NC3_URL', function($http, $q, NC3_URL) {
-  return function(data) {
-    return request($http, $q, NC3_URL, data, true);
-  };
-}]);
+(function() {
+  /**
+   * Likes Service Javascript
+   *
+   * @param {string} Controller name
+   * @param {function('$http', '$q')} Controller
+   */
+  NetCommonsApp.factory('LikesLoad', ['$http', '$q', 'NC3_URL', function($http, $q, NC3_URL) {
+    return function(data) {
+      return request($http, $q, NC3_URL, data, true);
+    };
+  }]);
 
-NetCommonsApp.factory('LikesSave', ['$http', '$q', 'NC3_URL', function($http, $q, NC3_URL) {
-  return function(data) {
-    return request($http, $q, NC3_URL, data, false);
-  };
-}]);
+  NetCommonsApp.factory('LikesSave', ['$http', '$q', 'NC3_URL', function($http, $q, NC3_URL) {
+    return function(data) {
+      return request($http, $q, NC3_URL, data, false);
+    };
+  }]);
 
-function request($http, $q, NC3_URL, params, isLoad) {
-  var deferred = $q.defer();
-  var promise = deferred.promise;
+  function request($http, $q, NC3_URL, params, isLoad) {
+    var deferred = $q.defer();
+    var promise = deferred.promise;
 
-  $http.get(NC3_URL + '/net_commons/net_commons/csrfToken.json')
-    .then(function(response) {
-        var url = NC3_URL;
-        params = Object.assign({}, params);
-        if (isLoad) {
-          params._Token = params.load._Token;
-          url += '/likes/likes/load.json';
-          delete params.LikesUser;
-        } else {
-          params._Token = params.save._Token;
-          url += '/likes/likes/save.json';
-        }
-        delete params.load;
-        delete params.save;
-
-        var token = response.data;
-        params._Token.key = token.data._Token.key;
-
-        // POSTリクエスト
-        $http.post(
-          url,
-          $.param({ _method: 'POST', data: params }),
-          {
-            cache: false,
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    $http.get(NC3_URL + '/net_commons/net_commons/csrfToken.json')
+      .then(function(response) {
+          var url = NC3_URL;
+          params = Object.assign({}, params);
+          if (isLoad) {
+            params._Token = params.load._Token;
+            url += '/likes/likes/load.json';
+            delete params.LikesUser;
+          } else {
+            params._Token = params.save._Token;
+            url += '/likes/likes/save.json';
           }
-        ).then(
-          function(response) {
-            //success condition
-            var data = response.data;
-            deferred.resolve(data);
-          },
-          function(response) {
-            //error condition
-            var data = response.data;
-            var status = response.status;
-            deferred.reject(data, status);
-          });
-      },
-      function(response) {
-        //Token error condition
-        var data = response.data;
-        var status = response.status;
-        deferred.reject(data, status);
-      });
+          delete params.load;
+          delete params.save;
 
-  promise.success = function(fn) {
-    promise.then(fn);
+          var token = response.data;
+          params._Token.key = token.data._Token.key;
+
+          // POSTリクエスト
+          $http.post(
+            url,
+            $.param({ _method: 'POST', data: params }),
+            {
+              cache: false,
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+            }
+          ).then(
+            function(response) {
+              //success condition
+              var data = response.data;
+              deferred.resolve(data);
+            },
+            function(response) {
+              //error condition
+              var data = response.data;
+              var status = response.status;
+              deferred.reject(data, status);
+            });
+        },
+        function(response) {
+          //Token error condition
+          var data = response.data;
+          var status = response.status;
+          deferred.reject(data, status);
+        });
+
+    promise.success = function(fn) {
+      promise.then(fn);
+      return promise;
+    };
+
+    promise.error = function(fn) {
+      promise.then(null, fn);
+      return promise;
+    };
+
     return promise;
-  };
-
-  promise.error = function(fn) {
-    promise.then(null, fn);
-    return promise;
-  };
-
-  return promise;
-}
+  }
+})();
 
 /**
  * Likes Controller Javascript
@@ -200,3 +202,4 @@ NetCommonsApp.controller('LikeSettings', ['$scope', function($scope) {
     }
   };
 }]);
+
