@@ -64,7 +64,7 @@ class LikesController extends LikesAppController {
 		if (Current::read('User.id')) {
 			$likesUserConditions['user_id'] = Current::read('User.id');
 		} else {
-			$likesUserConditions['session_key'] = Session::id();
+			$likesUserConditions['session_key'] = $this->Session->id();
 		}
 
 		$likesUserCount = $this->LikesUser->find('count', array(
