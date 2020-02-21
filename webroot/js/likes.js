@@ -10,58 +10,69 @@
    * Likes Service Javascript
    *
    * @param {string} Controller name
-   * @param {function('$q')} Controller
+   * @param {function('$http', '$q')} Controller
    */
-  NetCommonsApp.factory('LikesLoad', ['$q', 'NC3_URL', function($q, NC3_URL) {
+  NetCommonsApp.factory('LikesLoad', ['$http', '$q', 'NC3_URL', function($http, $q, NC3_URL) {
     return function(data) {
-      return request($q, NC3_URL, data, true);
+      return request($http, $q, NC3_URL, data, true);
     };
   }]);
 
-  NetCommonsApp.factory('LikesSave', ['$q', 'NC3_URL', function($q, NC3_URL) {
+  NetCommonsApp.factory('LikesSave', ['$http', '$q', 'NC3_URL', function($http, $q, NC3_URL) {
     return function(data) {
-      return request($q, NC3_URL, data, false);
+      return request($http, $q, NC3_URL, data, false);
     };
   }]);
 
-  function request($q, NC3_URL, params, isLoad) {
+  function request($http, $q, NC3_URL, params, isLoad) {
     var deferred = $q.defer();
     var promise = deferred.promise;
 
-    $.ajax({
-      url: NC3_URL + '/net_commons/net_commons/csrfToken.json', cache: false, success: function(data) {
-        var url = NC3_URL;
-        params = Object.assign({}, params);
-        if (isLoad) {
-          params._Token = params.load._Token;
-          url += '/likes/likes/load.json';
-          delete params.LikesUser;
-        } else {
-          params._Token = params.save._Token;
-          url += '/likes/likes/save.json';
-        }
-        delete params.load;
-        delete params.save;
-
-        var token = data;
-        params._Token.key = token.data._Token.key;
-        $.ajax({
-          url: url,
-          method: 'POST',
-          cache: false,
-          data: $.param({data: params}),
-          contentType: 'application/x-www-form-urlencoded',
-          success: function(data) {
-            deferred.resolve(data);
-          },
-          error: function(jqXHR) {
-            deferred.reject(jqXHR.responseText, jqXHR.status);
+    $http.get(NC3_URL + '/net_commons/net_commons/csrfToken.json')
+      .then(function(response) {
+          var url = NC3_URL;
+          params = Object.assign({}, params);
+          if (isLoad) {
+            params._Token = params.load._Token;
+            url += '/likes/likes/load.json';
+            delete params.LikesUser;
+          } else {
+            params._Token = params.save._Token;
+            url += '/likes/likes/save.json';
           }
+          delete params.load;
+          delete params.save;
+
+          var token = response.data;
+          params._Token.key = token.data._Token.key;
+
+          // POSTリクエスト
+          $http.post(
+            url,
+            $.param({_method: 'POST', data: params}),
+            {
+              cache: false,
+              headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+            }
+          ).then(
+            function(response) {
+              // success condition
+              var data = response.data;
+              deferred.resolve(data);
+            },
+            function(response) {
+              // error condition
+              var data = response.data;
+              var status = response.status;
+              deferred.reject(data, status);
+            });
+        },
+        function(response) {
+          // Token error condition
+          var data = response.data;
+          var status = response.status;
+          deferred.reject(data, status);
         });
-      }, error: function(jqXHR) {
-        deferred.reject(jqXHR.responseText, jqXHR.status);
-      }
-    });
 
     promise.success = function(fn) {
       promise.then(fn);
