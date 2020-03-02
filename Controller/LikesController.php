@@ -52,12 +52,20 @@ class LikesController extends LikesAppController {
 			return $this->throwBadRequest();
 		}
 
+		$this->set('_serialize', array('disabled', 'likeCount', 'unlikeCount'));
+
 		$contentKey = $this->data['Like']['content_key'];
 		$like = $this->Like->find('first', array(
 			'recursive' => -1,
 			'fields' => array('id', 'like_count', 'unlike_count'),
 			'conditions' => array('content_key' => $contentKey)
 		));
+		if (!isset($like['Like'])) {
+			$this->set('disabled', 0);
+			$this->set('likeCount', 0);
+			$this->set('unlikeCount', 0);
+			return;
+		}
 
 		$likesUserConditions = array(
 			'like_id' => $like['Like']['id'],
@@ -76,7 +84,6 @@ class LikesController extends LikesAppController {
 		$this->set('disabled', $likesUserCount);
 		$this->set('likeCount', (int)$like['Like']['like_count']);
 		$this->set('unlikeCount', (int)$like['Like']['unlike_count']);
-		$this->set('_serialize', array('disabled', 'likeCount', 'unlikeCount'));
 	}
 
 /**
