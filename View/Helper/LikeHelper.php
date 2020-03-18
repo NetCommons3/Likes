@@ -4,7 +4,7 @@
  *
  * @author Noriko Arai <arai@nii.ac.jp>
  * @author Shohei Nakajima <nakajimashouhei@gmail.com>
- * @author Kazunori Sakamoto <exkazuu@gmail.com>
+ * @author Kazunori Sakamoto <exkazuu@willbooster.com>
  * @link http://www.netcommons.org NetCommons Project
  * @license http://www.netcommons.org/license.txt NetCommons License
  * @copyright Copyright 2014, NetCommons Project
@@ -23,7 +23,7 @@ class_exists('Like');
  * * イイネ！、ヤダネ！ボタン表示:[buttonsメソッド](#buttons)
  *
  * @author Shohei Nakajima <nakajimashouhei@gmail.com>
- * @author Kazunori Sakamoto <exkazuu@gmail.com>
+ * @author Kazunori Sakamoto <exkazuu@willbooster.com>
  * @package NetCommons\Likes\View\Helper
  */
 class LikeHelper extends AppHelper {
@@ -33,13 +33,14 @@ class LikeHelper extends AppHelper {
  *
  * @var array
  */
-	public $helpers = array(
+	public $helpers = [
 		'Html',
 		'Form',
+		'NetCommons.CDNCache',
 		'NetCommons.NetCommonsForm',
 		'NetCommons.NetCommonsHtml',
 		'NetCommons.Token',
-	);
+	];
 
 /**
  * Before render callback. beforeRender is called before the view file is rendered.
@@ -140,33 +141,43 @@ class LikeHelper extends AppHelper {
  * #### Sample code
  * ##### template file(ctp file)
  * ```
- * <?php echo $this->Like->display($bbsSetting, $bbsArticle); ?>
+ * <?php echo $this->Like->display('BbsArticle', $bbsSetting, $bbsArticle); ?>
  * ```
  *
+ * @param array $model String of model name
  * @param array $setting Array of use like setting data.
  * @param array $content Array of content data with like count.
  * @param array $attributes Array of attributes and HTML arguments.
  * @return string HTML tags
  */
-	public function display($setting, $content, $attributes = array()) {
+	public function display($model, $setting, $content, $attributes = array()) {
 		$output = '';
+
+		$condsStr = $this->_View->request->params['plugin'] . '-'
+			. Current::read('Block.key') . '-' . $content[$model]['key'];
+
+		$like = $this->__getInitialLike($content);
 
 		//いいね
 		if (isset($setting['use_like']) && $setting['use_like']) {
-			$element = '<span class="glyphicon glyphicon-thumbs-up"></span> ';
-			$element .= (int)Hash::get($content, 'Like.like_count');
+			$element = '<span class="' . $condsStr . ' like-button">';
+			$element .= '<span class="glyphicon glyphicon-thumbs-up"></span> ';
+			$element .= '<span class="like-count">' . $like['like_count'] . '</span>';
+			$element .= '</span>';
 			$output .= $this->Html->div(
-						array('like-icon', 'text-muted'), $element, $attributes
-					);
+				array('like-icon', 'text-muted'), $element, $attributes
+			);
 		}
 
 		//わるいね
 		if (isset($setting['use_unlike']) && $setting['use_unlike']) {
-			$element = '<span class="glyphicon glyphicon-thumbs-down"></span> ';
-			$element .= (int)Hash::get($content, 'Like.unlike_count');
+			$element = '<span class="' . $condsStr . ' like-button">';
+			$element .= '<span class="glyphicon glyphicon-thumbs-down"></span> ';
+			$element .= '<span class="unlike-count">' . $like['unlike_count'] . '</span>';
+			$element .= '</span>';
 			$output .= $this->Html->div(
-						array('like-icon', 'text-muted'), $element, $attributes
-					);
+				array('like-icon', 'text-muted'), $element, $attributes
+			);
 		}
 
 		return $output;
@@ -195,12 +206,12 @@ class LikeHelper extends AppHelper {
 	public function buttons($model, $setting, $content, $attributes = array()) {
 		$output = '';
 
-		if (! Hash::get($setting, 'use_like') && ! Hash::get($setting, 'use_like')) {
+		if (! Hash::get($setting, 'use_like') && ! Hash::get($setting, 'use_unlike')) {
 			return $output;
 		}
 
 		if ($content[$model]['status'] !== WorkflowComponent::STATUS_PUBLISHED) {
-			return $this->display($setting, $content, $attributes);
+			return $this->display($model, $setting, $content, $attributes);
 		}
 
 		if (! isset($content['Like']['id'])) {
@@ -218,65 +229,51 @@ class LikeHelper extends AppHelper {
 			);
 		}
 
-		$currentData = $this->_View->request->data;
-
-		$data = array(
-			'Frame' => array('id' => Current::read('Frame.id')),
-			'Like' => array(
+		$data = [
+			'Frame' => ['id' => Current::read('Frame.id')],
+			'Like' => [
 				'plugin_key' => Hash::get($content, 'Like.plugin_key'),
 				'block_key' => Hash::get($content, 'Like.block_key'),
 				'content_key' => Hash::get($content, 'Like.content_key'),
-			),
-		);
-
-		$tokenFields = Hash::flatten($data);
-		$hiddenFields = array_keys($tokenFields);
-
-		$this->_View->request->data = $data;
-		$loadToken = $this->Token->getToken('LikeLoad', '/likes/likes/load.json', $tokenFields, $hiddenFields);
-
-		$data += array(
-			'LikesUser' => array(
+			],
+			'LikesUser' => [
 				'like_id' => Hash::get($content, 'LikesUser.like_id'),
 				'user_id' => Hash::get($content, 'LikesUser.user_id'),
 				'is_liked' => Hash::get($content, 'LikesUser.is_liked'),
-			),
-		);
+			],
+		];
 
 		$tokenFields = Hash::flatten($data);
 		$hiddenFields = $tokenFields;
 		unset($hiddenFields['LikesUser.is_liked']);
 		$hiddenFields = array_keys($hiddenFields);
 
+		$currentData = $this->_View->request->data;
 		$this->_View->request->data = $data;
-		$saveToken = $this->Token->getToken('LikeSave', '/likes/likes/save.json', $tokenFields, $hiddenFields);
+
+		$token = $this->Token->getToken('LikeSave', '/likes/likes/save.json', $tokenFields, $hiddenFields);
+		$data += $token;
 
 		$this->_View->request->data = $currentData;
 
-		$data += array(
-			'load' => $loadToken,
-			'save' => $saveToken
-		);
+		$like = $content['Like'];
+		$condsStr = $like['plugin_key'] . '-' . $like['block_key'] . '-' . $like['content_key'];
 
-		$options = array(
-			'likeCount' => '-',
-			'unlikeCount' => '-',
-			'disabled' => true
-		);
+		$like = $this->__getInitialLike($content);
 
 		$output .= '<div class="like-icon" ng-controller="Likes" ' .
-						'ng-init="initialize(' . h(json_encode($data)) . ', ' . h(json_encode($options)) . ')">';
+			'ng-init="initialize(' . h(json_encode($data)) . ')">';
 
 		//いいね
 		if (Hash::get($setting, 'use_like')) {
-			$output .= $this->Html->div(array('like-icon'),
-					$this->_View->element('Likes.like_button', ['isLiked' => Like::IS_LIKE]), $attributes);
+			$output .= $this->Html->div(array('like-icon'), $this->_View->element('Likes.like_button',
+				['condsStr' => $condsStr, 'like' => $like, 'isLiked' => Like::IS_LIKE]), $attributes);
 		}
 
 		//わるいね
 		if (Hash::get($setting, 'use_unlike')) {
-			$output .= $this->Html->div(array('like-icon'),
-					$this->_View->element('Likes.like_button', ['isLiked' => Like::IS_UNLIKE]), $attributes);
+			$output .= $this->Html->div(array('like-icon'), $this->_View->element('Likes.like_button',
+				['condsStr' => $condsStr, 'like' => $like, 'isLiked' => Like::IS_UNLIKE]), $attributes);
 		}
 
 		$output .= '</div>';
@@ -284,4 +281,25 @@ class LikeHelper extends AppHelper {
 		return $output;
 	}
 
+/**
+ * Ajaxの実行前に表示すべきいいね情報を返します。
+ *
+ * @param array $content Array of content data with like count.
+ * @return array
+ */
+	private function __getInitialLike($content) {
+		if ($this->CDNCache->isCacheable()) {
+			return [
+				'like_count' => '-',
+				'unlike_count' => '-',
+				'disabled' => true,
+			];
+		}
+		$like = $content['Like'];
+		return [
+			'like_count' => Hash::get($like, 'like_count', 0),
+			'unlike_count' => Hash::get($like, 'unlike_count', 0),
+			'disabled' => $content['LikesUser']['is_liked'],
+		];
+	}
 }

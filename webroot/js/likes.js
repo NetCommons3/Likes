@@ -1,55 +1,30 @@
 /**
  * @fileoverview Likes Javascript
  * @author nakajimashouhei@gmail.com (Shohei Nakajima)
- * @author exkazuu@gmail.com (Kazunori Sakamoto)
+ * @author exkazuu@willbooster.com (Kazunori Sakamoto)
  */
 
 
-(function() {
-  /**
-   * Likes Service Javascript
-   *
-   * @param {string} Controller name
-   * @param {function('$http', '$q')} Controller
-   */
-  NetCommonsApp.factory('LikesLoad', ['$http', '$q', 'NC3_URL', function($http, $q, NC3_URL) {
-    return function(data) {
-      return request($http, $q, NC3_URL, data, true);
-    };
-  }]);
-
-  NetCommonsApp.factory('LikesSave', ['$http', '$q', 'NC3_URL', function($http, $q, NC3_URL) {
-    return function(data) {
-      return request($http, $q, NC3_URL, data, false);
-    };
-  }]);
-
-  function request($http, $q, NC3_URL, params, isLoad) {
+/**
+ * Likes Service Javascript
+ *
+ * @param {string} Controller name
+ * @param {function('$http', '$q')} Controller
+ */
+NetCommonsApp.factory('LikesSave', ['$http', '$q', 'NC3_URL', function($http, $q, NC3_URL) {
+  return function(data) {
     var deferred = $q.defer();
     var promise = deferred.promise;
 
     $http.get(NC3_URL + '/net_commons/net_commons/csrfToken.json')
       .then(function(response) {
-          var url = NC3_URL;
-          params = Object.assign({}, params);
-          if (isLoad) {
-            params._Token = params.load._Token;
-            url += '/likes/likes/load.json';
-            delete params.LikesUser;
-          } else {
-            params._Token = params.save._Token;
-            url += '/likes/likes/save.json';
-          }
-          delete params.load;
-          delete params.save;
-
           var token = response.data;
-          params._Token.key = token.data._Token.key;
+          data._Token.key = token.data._Token.key;
 
           // POSTリクエスト
           $http.post(
-            url,
-            $.param({_method: 'POST', data: params}),
+            NC3_URL + '/likes/likes/save.json',
+            $.param({_method: 'POST', data: data}),
             {
               cache: false,
               headers: {'Content-Type': 'application/x-www-form-urlencoded'}
@@ -85,16 +60,16 @@
     };
 
     return promise;
-  }
-})();
+  };
+}]);
 
 /**
  * Likes Controller Javascript
  *
  * @param {string} Controller name
- * @param {function($scope, LikesLoad, LikesSave)} Controller
+ * @param {function($scope, LikesSave)} Controller
  */
-NetCommonsApp.controller('Likes', ['$scope', 'LikesLoad', 'LikesSave', function($scope, LikesLoad, LikesSave) {
+NetCommonsApp.controller('Likes', ['$scope', 'LikesSave', function($scope, LikesSave) {
 
   /**
    * Request parameters
@@ -104,16 +79,6 @@ NetCommonsApp.controller('Likes', ['$scope', 'LikesLoad', 'LikesSave', function(
   $scope.data = null;
 
   /**
-   * Options parameters
-   *   - disabled
-   *   - likeCounts
-   *   - unlikeCounts
-   *
-   * @type {object}
-   */
-  $scope.options = null;
-
-  /**
    * initialize
    *   - disabled
    *   - likeCounts
@@ -121,17 +86,8 @@ NetCommonsApp.controller('Likes', ['$scope', 'LikesLoad', 'LikesSave', function(
    *
    * @return {void}
    */
-  $scope.initialize = function(data, options) {
+  $scope.initialize = function(data) {
     $scope.data = data;
-    $scope.options = options;
-    $scope.options.disabled = true;
-
-    LikesLoad($scope.data)
-      .success(function(data) {
-        $scope.options.disabled = data.disabled;
-        $scope.options.likeCount = data.likeCount;
-        $scope.options.unlikeCount = data.unlikeCount;
-      });
   };
 
   /**
@@ -139,25 +95,28 @@ NetCommonsApp.controller('Likes', ['$scope', 'LikesLoad', 'LikesSave', function(
    *
    * @return {void}
    */
-  $scope.save = function(isLiked) {
-    $scope.data.LikesUser.is_liked = isLiked;
-    if ($scope.options.disabled) {
-      return;
-    }
-    $scope.options.disabled = true;
-    $scope.sending = true;
+  $scope.save = function(isLiked, condsStr) {
+    var queryPrefix = '.' + condsStr;
+    var aDisplay = $(queryPrefix + ' > a').css('display');
+    var spanDisplay = $(queryPrefix + ' > span').css('display');
 
+    $(queryPrefix + ' > a').css('display', 'none');
+    $(queryPrefix + ' > span').css('display', '');
+
+    $scope.data.LikesUser.is_liked = isLiked;
     LikesSave($scope.data)
       .success(function() {
-        $scope.sending = false;
+        var $counts;
         if (isLiked) {
-          $scope.options.likeCount += 1;
+          $counts = $(queryPrefix + ' .like-count');
         } else {
-          $scope.options.unlikeCount += 1;
+          $counts = $(queryPrefix + ' .unlike-count');
         }
+        $counts.each(function() { $(this).text(Number($(this).text()) + 1); });
       })
       .error(function() {
-        $scope.sending = false;
+        $(queryPrefix + ' > a').css('display', aDisplay);
+        $(queryPrefix + ' > span').css('display', spanDisplay);
       });
   };
 }]);

@@ -4,7 +4,7 @@
  *
  * @author Noriko Arai <arai@nii.ac.jp>
  * @author Shohei Nakajima <nakajimashouhei@gmail.com>
- * @author Kazunori Sakamoto <exkazuu@gmail.com>
+ * @author Kazunori Sakamoto <exkazuu@willbooster.com>
  * @link http://www.netcommons.org NetCommons Project
  * @license http://www.netcommons.org/license.txt NetCommons License
  * @copyright Copyright 2014, NetCommons Project
@@ -16,7 +16,7 @@ App::uses('LikesAppController', 'Likes.Controller');
  * Likes Controller
  *
  * @author Shohei Nakajima <nakajimashouhei@gmail.com>
- * @author Kazunori Sakamoto <exkazuu@gmail.com>
+ * @author Kazunori Sakamoto <exkazuu@willbooster.com>
  * @package NetCommons\Likes\Controller
  */
 class LikesController extends LikesAppController {
@@ -48,42 +48,45 @@ class LikesController extends LikesAppController {
  * @return void
  */
 	public function load() {
-		if (! $this->request->is('post')) {
-			return $this->throwBadRequest();
-		}
+		$likes = [];
+		$condsStrs = explode(',', $this->request->query('like_conds_strs'));
 
-		$this->set('_serialize', array('disabled', 'likeCount', 'unlikeCount'));
-
-		$contentKey = $this->data['Like']['content_key'];
-		$like = $this->Like->find('first', array(
-			'recursive' => -1,
-			'fields' => array('id', 'like_count', 'unlike_count'),
-			'conditions' => array('content_key' => $contentKey)
-		));
-		if (!isset($like['Like'])) {
-			$this->set('disabled', 0);
-			$this->set('likeCount', 0);
-			$this->set('unlikeCount', 0);
-			return;
-		}
-
-		$likesUserConditions = array(
-			'like_id' => $like['Like']['id'],
-		);
+		$likesUserConditions = [];
 		if (Current::read('User.id')) {
 			$likesUserConditions['user_id'] = Current::read('User.id');
 		} else {
 			$likesUserConditions['session_key'] = $this->Session->id();
 		}
 
-		$likesUserCount = $this->LikesUser->find('count', array(
-			'recursive' => -1,
-			'conditions' => $likesUserConditions
-		));
+		foreach ($condsStrs as $condsStr) {
+			$conds = explode('-', $condsStr);
+			$like = $this->Like->find('first', [
+				'fields' => [
+					'id',
+					'like_count',
+					'unlike_count',
+				],
+				'conditions' => [
+					'plugin_key' => $conds[0],
+					'block_key' => $conds[1],
+					'content_key' => $conds[2],
+				],
+				'recursive' => -1,
+			]);
+			if (! empty($like)) {
+				$like = $like['Like'];
+				$likesUserConditions['like_id'] = $like['id'];
+				$like['disabled'] = $this->LikesUser->find('count', [
+					'conditions' => $likesUserConditions,
+					'recursive' => -1,
+				]);
+				unset($like['id']);
+				$likes[$condsStr] = $like;
+			}
+		}
 
-		$this->set('disabled', $likesUserCount);
-		$this->set('likeCount', (int)$like['Like']['like_count']);
-		$this->set('unlikeCount', (int)$like['Like']['unlike_count']);
+		$this->set('likes', $likes);
+		$this->set('_serialize', ['likes']);
 	}
 
 /**

@@ -4,6 +4,7 @@
  *
  * @author Noriko Arai <arai@nii.ac.jp>
  * @author Shohei Nakajima <nakajimashouhei@gmail.com>
+ * @author Kazunori Sakamoto <exkazuu@willbooster.com>
  * @link http://www.netcommons.org NetCommons Project
  * @license http://www.netcommons.org/license.txt NetCommons License
  * @copyright Copyright 2014, NetCommons Project
@@ -17,6 +18,7 @@ App::uses('NetCommonsCakeTestCase', 'NetCommons.TestSuite');
  * Display for LikeHelper Test Case
  *
  * @author Shohei Nakajima <nakajimashouhei@gmail.com>
+ * @author Kazunori Sakamoto <exkazuu@willbooster.com>
  * @package NetCommons\Likes\Test\Case\View\Helper
  */
 class LikeHelperDisplayTest extends NetCommonsCakeTestCase {
@@ -61,7 +63,7 @@ class LikeHelperDisplayTest extends NetCommonsCakeTestCase {
  * @return void
  */
 	public function testDisplay($setting, $content) {
-		$result = $this->Like->display($setting, $content);
+		$result = $this->Like->display('Video', $setting, $content);
 
 		if ($setting['use_like'] === 1) {
 			$this->assertContains('glyphicon glyphicon-thumbs-up', $result);
