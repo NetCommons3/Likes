@@ -176,9 +176,11 @@ class Like extends LikesAppModel {
  * Exists like data
  *
  * @param string $contentKey Content key of each plugin.
+ * @param string $md5SessionKey md5(SessionKey)
+ * @see https://github.com/researchmap/RmNetCommons3/issues/1750#issuecomment-596823362
  * @return bool
  */
-	public function existsLike($contentKey) {
+	public function existsLike($contentKey, $md5SessionKey = null) {
 		$this->LikesUser = ClassRegistry::init('Likes.LikesUser');
 
 		$joinConditions = array(
@@ -186,8 +188,11 @@ class Like extends LikesAppModel {
 		);
 		if (Current::read('User.id')) {
 			$joinConditions[$this->LikesUser->alias . '.user_id'] = Current::read('User.id');
+		} elseif (!is_null($md5SessionKey)) {
+			$joinConditions[$this->LikesUser->alias . '.session_key'] = (string)$md5SessionKey;
 		} else {
-			$joinConditions[$this->LikesUser->alias . '.session_key'] = (string)CakeSession::id();
+			// 常にインクリメント
+			return false;
 		}
 
 		$count = $this->find('count', array(
@@ -224,7 +229,6 @@ class Like extends LikesAppModel {
 		$this->begin();
 
 		//バリデーション
-		$data['LikesUser']['session_key'] = CakeSession::id();
 		$this->set($data);
 		if (! $this->validates()) {
 			$this->rollback();

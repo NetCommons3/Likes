@@ -98,8 +98,8 @@ class LikesController extends LikesAppController {
 		if (! $this->request->is('post')) {
 			return $this->throwBadRequest();
 		}
-
-		if ($this->Like->existsLike($this->data['Like']['content_key'])) {
+		$md5SessionKey = $this->__getKey();
+		if ($this->Like->existsLike($this->data['Like']['content_key'], $md5SessionKey)) {
 			return;
 		}
 
@@ -109,9 +109,27 @@ class LikesController extends LikesAppController {
 			'conditions' => array('content_key' => $data['Like']['content_key'])
 		));
 		$data = Hash::merge($like, $data);
+		if (!Current::read('User.id')) {
+			$data['LikesUser']['session_key'] = $md5SessionKey;
+		}
 		if ($this->Like->saveLike($data)) {
 			return;
 		}
 		$this->NetCommons->handleValidationError($this->Like->validationErrors);
+	}
+
+/**
+ * session_keyを返す
+ *
+ * @return string
+ */
+	private function __getKey() {
+		$md5SessionKey = $this->Session->read('Likes.md5_session_key');
+		if ($md5SessionKey) {
+			return $md5SessionKey;
+		}
+		$md5SessionKey = md5(CakeSession::id());
+		$this->Session->write('Likes.md5_session_key', $md5SessionKey);
+		return $md5SessionKey;
 	}
 }
