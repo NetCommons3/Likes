@@ -12,7 +12,7 @@
 
 <span class="<?php echo $condsStr; ?> like-button">
 	<a href="" <?php echo $like['disabled'] ? 'style="display: none;"' : ''; ?>
-			ng-click="save(<?php echo $isLiked; ?>, <?php echo h(json_encode($condsStr)); ?>)">
+			ng-click="save(<?php echo $isLiked . ', ' . h(json_encode($condsStr)); ?>)">
 		<?php if ($isLiked === Like::IS_LIKE) : ?>
 			<span class="glyphicon glyphicon-thumbs-up"></span>
 			<span class="like-count"><?php echo $like['like_count']; ?></span>

@@ -19,5 +19,11 @@ App::uses('AppModel', 'Model');
  * @package NetCommons\Likes\Model
  */
 class LikesAppModel extends AppModel {
-    public $invalidateCDN = false;
+
+/**
+ * CDNを無効にする
+ *
+ * @var bool
+ */
+	public $invalidateCDN = false;
 }

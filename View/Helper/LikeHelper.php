@@ -153,8 +153,8 @@ class LikeHelper extends AppHelper {
 	public function display($model, $setting, $content, $attributes = array()) {
 		$output = '';
 
-		$condsStr = $this->_View->request->params['plugin'] . '-'
-			. Current::read('Block.key') . '-' . $content[$model]['key'];
+		$condsStr = $this->_View->request->params['plugin'] . '-' .
+				Current::read('Block.key') . '-' . $content[$model]['key'];
 
 		$like = $this->__getInitialLike($content);
 
@@ -251,7 +251,9 @@ class LikeHelper extends AppHelper {
 		$currentData = $this->_View->request->data;
 		$this->_View->request->data = $data;
 
-		$token = $this->Token->getToken('LikeSave', '/likes/likes/save.json', $tokenFields, $hiddenFields);
+		$token = $this->Token->getToken(
+			'LikeSave', '/likes/likes/save.json', $tokenFields, $hiddenFields
+		);
 		$data += $token;
 
 		$this->_View->request->data = $currentData;
