@@ -154,7 +154,7 @@ class LikeHelper extends AppHelper {
 		$output = '';
 
 		$condsStr = $this->_View->request->params['plugin'] . '-' .
-				Current::read('Block.key') . '-' . $content[$model]['key'];
+				Current::read('Block.key') . '-' . ($content[$model]['key'] ?? '');
 
 		$like = $this->__getInitialLike($content);
 
